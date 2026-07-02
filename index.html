@@ -303,6 +303,49 @@ const PROP_AVGS={"LSA Alvalade by Numa":{"avg_clean_ota":8.39,"avg_overall_ota":
 const CURRENT_MONTH="2026-07";
 const GLASS_THEMES={};
 
+// ── Derived data (post-process from raw constants) ───────────────────
+const INSP_CB_MAP=(function(){
+  // Build lookup: property short name → month → {callbacks, rate}
+  const byPropMonth={};
+  INSP_CALLBACKS.forEach(cb=>{
+    const ps=cb.property; // "Anjos","Rato"
+    const m=cb.timestamp.slice(0,7);
+    if(!byPropMonth[ps])byPropMonth[ps]={};
+    byPropMonth[ps][m]=(byPropMonth[ps][m]||0)+1;
+  });
+  // Attach rates
+  const out={};
+  Object.keys(byPropMonth).forEach(ps=>{
+    out[ps]={};
+    const fullProp=Object.keys(INSP_DATA).find(p=>p.replace(' by Numa','').replace('Lisbon ','')===ps);
+    Object.keys(byPropMonth[ps]).forEach(m=>{
+      const cbs=byPropMonth[ps][m];
+      const total=fullProp&&INSP_DATA[fullProp][m]?INSP_DATA[fullProp][m].to_inspection:0;
+      out[ps][m]={callbacks:cbs,rate:total>0?Math.round(cbs/total*100):0};
+    });
+  });
+  return out;
+})();
+
+// Derive missing PORTFOLIO fields
+(function(){
+  Object.keys(PORTFOLIO).forEach(p=>{
+    const ps=p.replace(' by Numa','').replace('Lisbon ','');
+    const inspByMonth=INSP_DATA[p]||{};
+    const sortedM=Object.keys(inspByMonth).sort();
+    // cleanings_90d ≈ sum of last 2 full months to_inspection
+    const recent=sortedM.filter(m=>m<CURRENT_MONTH).slice(-2);
+    PORTFOLIO[p].cleanings_90d=recent.reduce((s,m)=>s+(inspByMonth[m].to_inspection||0),0);
+    // callback stats (only Anjos/Rato have checklist)
+    const cbCount=INSP_CALLBACKS.filter(cb=>cb.property===ps).length;
+    const cbTotal=Object.values(inspByMonth).reduce((s,m)=>s+(m.to_inspection||0),0);
+    PORTFOLIO[p].cb_count=cbCount;
+    PORTFOLIO[p].cb_total=cbTotal;
+    PORTFOLIO[p].cb_rate=(cbTotal>0&&cbCount>0)?Math.round(cbCount/cbTotal*100):null;
+    PORTFOLIO[p].coverage=null; // supervisor inspection data not available
+  });
+})();
+
 const WEEKDAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
 function badge(p){return DLY_BRAND[p]==='Numa'?'<div class="badge badge-N">N</div>':'<div class="badge badge-L">L</div>';}
@@ -491,8 +534,8 @@ function bldIp(){
   const months=INSP_MONTHS,props=fp(ipB);
   document.getElementById('ip-head').innerHTML=`<tr><th style="width:28px"></th><th>Property</th>${months.map(m=>`<th class="mhdr">${m.slice(5)}<br><span style="font-size:9px;color:#aaa">${m.slice(0,4)}</span></th>`).join('')}</tr>`;
   document.getElementById('ip-body').innerHTML=gr(props,p=>{
-    const ps=p.replace(' by Numa','').replace('Lisbon ',''),cbData=INSP_CALLBACKS[ps]||{};
-    const cells=months.map(m=>{const r=(INSP_DATA[p]||{})[m],insp=r?r.inspected:null,cb=cbData[m];const cbStr=cb?`<span class="pct ${cb.rate>=40?'c-red':cb.rate>=20?'c-amber':'c-green'}" style="font-size:9px;padding:1px 4px">${cb.callbacks}cb ${cb.rate}%</span>`:'';return`<td style="text-align:center">${insp!=null?`<div style="font-weight:600">${insp.toLocaleString()}</div>${cbStr}`:'<span style="color:#ccc">—</span>'}</td>`;}).join('');
+    const ps=p.replace(' by Numa','').replace('Lisbon ',''),cbData=INSP_CB_MAP[ps]||{};
+    const cells=months.map(m=>{const r=(INSP_DATA[p]||{})[m],insp=r?r.to_inspection:null,cb=cbData[m];const cbStr=cb?`<span class="pct ${cb.rate>=40?'c-red':cb.rate>=20?'c-amber':'c-green'}" style="font-size:9px;padding:1px 4px">${cb.callbacks}cb ${cb.rate}%</span>`:'';return`<td style="text-align:center">${insp!=null?`<div style="font-weight:600">${insp.toLocaleString()}</div>${cbStr}`:'<span style="color:#ccc">—</span>'}</td>`;}).join('');
     return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td>${cells}</tr>`;
   });
 }bldIp();
