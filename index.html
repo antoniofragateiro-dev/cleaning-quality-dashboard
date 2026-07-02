@@ -1,0 +1,855 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Cleaning Quality Dashboard",
+  "schemaVersion": 1,
+  "description": "Cleaning Quality Dashboard — Portugal. 21 Lisbon properties (2 Numa + 19 LSA). Delay heatmap, OTA ratings, cleaner scores, checklist callbacks. Week 2026-06-22 → 2026-06-29. Refreshed 1 Jul 2026.",
+  "mcpTools": [],
+  "mcpServerNames": []
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Portugal Cleaning Quality</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a1a;font-size:13px}
+.hdr{background:#fff;border-bottom:1px solid #e5e5e5;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.hdr h1{font-size:15px;font-weight:600}
+.hdr .sub{font-size:11px;color:#888;margin-left:auto}
+.mode-bar{background:#fff;border-bottom:1px solid #e5e5e5;padding:0 20px;display:flex;gap:0}
+.mode-btn{padding:10px 18px;font-size:12px;font-weight:600;letter-spacing:.3px;border:none;background:none;cursor:pointer;color:#888;border-bottom:3px solid transparent}
+.mode-btn.active{color:#0d9488;border-bottom-color:#0d9488}
+.tabs{display:flex;gap:1px;background:#e5e5e5;border-bottom:1px solid #e5e5e5;padding:0 16px;overflow-x:auto}
+.tab{padding:9px 13px;cursor:pointer;font-size:11px;font-weight:500;color:#666;border-bottom:2px solid transparent;white-space:nowrap;background:#f8f8f6}
+.tab:hover{color:#1a1a1a}
+.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;background:#fff}
+.mode-panel{display:none}
+.mode-panel.active{display:block}
+.content{display:none;padding:16px}
+.content.active{display:block}
+.filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:4px 12px;border-radius:4px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:11px;font-weight:500;color:#555}
+.filter-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.slbl{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.sum-body{padding:16px}
+.alerts-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:14px}
+.alert{padding:10px 14px;border-radius:8px;border:.5px solid}
+.alert-danger{background:#fef2f2;border-color:#fca5a5}
+.alert-warn{background:#fffbeb;border-color:#fcd34d}
+.alert-ok{background:#f0fdf4;border-color:#86efac}
+.al{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.alert-danger .al{color:#b91c1c}.alert-warn .al{color:#b45309}.alert-ok .al{color:#166534}
+.ab{font-size:12px;line-height:1.4}
+.alert-danger .ab{color:#7f1d1d}.alert-warn .ab{color:#78350f}.alert-ok .ab{color:#14532d}
+.brand-panels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.brand-panel{background:#fff;border-radius:8px;border:.5px solid #e5e5e5;padding:14px 16px}
+.brand-panel-numa{border-top:3px solid #0d9488}
+.brand-panel-lsa{border-top:3px solid #ea580c}
+.bp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.bp-numa .bp-title{color:#0d9488}
+.bp-lsa .bp-title{color:#ea580c}
+.bp-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bp-kpi-lbl{font-size:10px;color:#9ca3af;margin-bottom:2px}
+.bp-kpi-val{font-size:18px;font-weight:600;line-height:1.1}
+.bp-kpi-sub{font-size:9px;color:#bbb;margin-top:1px}
+.findings-box{background:#fff;border-radius:8px;border:.5px solid #e5e5e5;padding:16px 20px;margin-bottom:14px}
+.findings-box h3{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f0f0ee}
+.finding{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start}
+.finding:last-child{margin-bottom:0}
+.fi{font-size:14px;flex-shrink:0;margin-top:1px}
+.ft{font-size:12px;line-height:1.5;color:#374151}
+.ft strong{color:#1a1a1a}
+.actions{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.action{display:flex;gap:10px;padding:9px 13px;border-radius:7px;align-items:flex-start}
+.ac{background:#fef2f2;border-left:3px solid #dc2626}
+.aw{background:#fffbeb;border-left:3px solid #f59e0b}
+.ai{background:#eff6ff;border-left:3px solid #3b82f6}
+.an{width:20px;height:20px;min-width:20px;border-radius:50%;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.abody{font-size:12px;line-height:1.45;color:#374151}
+.abody strong{color:#111}
+.scorecard-wrap{background:#fff;border-radius:8px;border:.5px solid #e5e5e5;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.gh td{background:#f0fdf4;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:.5px;padding:5px 10px!important;border-bottom:1px solid #d1fae5!important}
+.gh-lsa td{background:#fff7ed;font-size:10px;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:.5px;padding:5px 10px!important;border-bottom:1px solid #fed7aa!important}
+.agg-row td{background:#f8f8f6;font-weight:600;font-size:11px;border-bottom:1px solid #e5e5e5!important}
+table{width:100%;border-collapse:collapse}
+th{background:#f4f4f2;font-size:11px;font-weight:600;color:#555;padding:8px 10px;text-align:left;border-bottom:1px solid #e5e5e5;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #f0f0ee;font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.badge-N{background:#0d9488}.badge-L{background:#ea580c}
+.pct{border-radius:3px;font-weight:600;font-size:11px;padding:2px 5px;white-space:nowrap;display:inline-block}
+.c-red{background:#fee2e2;color:#991b1b}
+.c-amber{background:#fef3c7;color:#92400e}
+.c-green{background:#f0fdf4;color:#166534}
+.c-grey{background:#f3f3f1;color:#aaa}
+.sub-pct{font-size:9px;color:#888;font-weight:400}
+.ota{font-weight:600;font-size:12px}
+.ota-good{color:#166534}.ota-mid{color:#92400e}.ota-bad{color:#991b1b}.ota-na{color:#bbb}
+.mhdr{text-align:center;font-size:10px;padding:6px 4px!important}
+.partial{display:block;font-size:8px;color:#aaa;font-weight:400;text-transform:uppercase}
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:12px 14px;font-size:12px;color:#78350f;margin-bottom:12px}
+.bar{display:inline-block;height:6px;border-radius:3px;vertical-align:middle;margin-left:6px}
+.low-n{font-size:10px;color:#d97706;margin-left:4px}
+.red{color:#dc2626}.amber{color:#d97706}.green{color:#16a34a}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div style="width:28px;height:28px;background:#0d9488;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">PT</div>
+  <h1>Portugal Cleaning Quality</h1>
+  <span class="sub">Lisbon · 21 properties · Updated 2 Jul 2026</span>
+  <button id="refresh-btn" onclick="triggerRefresh()" style="margin-left:12px;padding:5px 12px;background:#f3f4f6;border:1px solid #e5e5e5;border-radius:6px;font-size:11px;font-weight:600;color:#555;cursor:pointer;display:flex;align-items:center;gap:5px">
+    <span id="refresh-icon">↻</span><span id="refresh-label">Refresh data</span>
+  </button>
+</div>
+<div class="mode-bar">
+  <button class="mode-btn active" onclick="switchMode('summary',this)">Summary</button>
+  <button class="mode-btn" onclick="switchMode('operational',this)">Operational detail</button>
+</div>
+
+<!-- SUMMARY -->
+<div id="mode-summary" class="mode-panel active">
+<div class="sum-body">
+  <div class="alerts-row" id="alert-strip"></div>
+  <div class="brand-panels">
+    <div class="brand-panel brand-panel-numa bp-numa">
+      <div class="bp-title">Numa — Anjos &amp; Rato</div>
+      <div class="bp-kpis" id="bp-numa"></div>
+    </div>
+    <div class="brand-panel brand-panel-lsa bp-lsa">
+      <div class="bp-title">LSA by Numa — 19 properties</div>
+      <div class="bp-kpis" id="bp-lsa"></div>
+    </div>
+  </div>
+  <div class="findings-box">
+    <h3>Key findings</h3>
+    <div id="findings-list"></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0ee">
+      <div class="slbl" style="margin-bottom:7px">Priority actions</div>
+      <div class="actions" id="actions-list"></div>
+    </div>
+  </div>
+  <div class="slbl" style="margin-bottom:8px;display:flex;align-items:center;gap:12px">
+    Portfolio at a glance
+    <span style="display:flex;gap:5px;font-weight:400">
+      <button class="filter-btn active" id="sc-all" onclick="filterSc('all',this)" style="padding:2px 9px">All</button>
+      <button class="filter-btn" id="sc-numa" onclick="filterSc('Numa',this)" style="padding:2px 9px">Numa</button>
+      <button class="filter-btn" id="sc-lsa"  onclick="filterSc('LSA',this)"  style="padding:2px 9px">LSA</button>
+    </span>
+  </div>
+  <div class="scorecard-wrap">
+    <table>
+      <thead><tr>
+        <th style="width:28px"></th><th>Property</th>
+        <th style="text-align:center">B.com 30d</th>
+        <th style="text-align:center">B.com Clean 30d</th>
+        <th style="text-align:center">Delay last wk</th>
+        <th style="text-align:center">4-wk avg</th>
+        <th style="text-align:center">Callback %</th>
+        <th style="text-align:center">Guest sentiment</th>
+      </tr></thead>
+      <tbody id="scorecard-body"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- OPERATIONAL -->
+<div id="mode-operational" class="mode-panel">
+<div class="tabs">
+  <div class="tab active" data-tab="portfolio">Portfolio</div>
+  <div class="tab" data-tab="cleaners">Cleaners</div>
+  <div class="tab" data-tab="ratings">Ratings</div>
+  <div class="tab" data-tab="inspections">Inspections/month</div>
+  <div class="tab" data-tab="callbacks">Callback reasons</div>
+  <div class="tab" data-tab="units">Units NPS</div>
+  <div class="tab" data-tab="delays">Delay heatmap</div>
+  <div class="tab" data-tab="delay-monthly">Monthly trend</div>
+  <div class="tab" data-tab="guest-themes">Guest themes</div>
+</div>
+<div id="tab-portfolio" class="content active">
+  <div class="filters">
+    <button class="filter-btn active" onclick="fpf('all',this)">All</button>
+    <button class="filter-btn" onclick="fpf('Numa',this)">Numa</button>
+    <button class="filter-btn" onclick="fpf('LSA',this)">LSA</button>
+  </div>
+  <table><thead><tr><th style="width:28px"></th><th>Property</th><th style="text-align:center">B.com 30d</th><th style="text-align:center">B.com Clean 30d</th><th style="text-align:center">Cleanings (90d)</th><th style="text-align:center">Coverage %</th><th style="text-align:center">Callback %</th><th style="text-align:center">Guest sentiment</th></tr></thead><tbody id="pf-body"></tbody></table>
+</div>
+<div id="tab-cleaners" class="content">
+  <div class="note">✅ <strong>Anjos &amp; Rato:</strong> OTA cleanliness (B.com/Airbnb via <code>cleaner_assignment</code>) + checkout NPS. ⚠️ <strong>LSA:</strong> No individual assignment data in SHINE.</div>
+  <div class="filters"><button class="filter-btn active" onclick="fcl('all',this)">All</button><button class="filter-btn" onclick="fcl('Lisbon Anjos',this)">Anjos</button><button class="filter-btn" onclick="fcl('Lisbon Rato',this)">Rato</button></div>
+  <table><thead><tr><th>Cleaner</th><th>Property</th><th style="text-align:center">Cleanings (90d)</th><th style="text-align:center">OTA Cleanliness</th><th style="text-align:center">Inspections</th><th style="text-align:center">Callback %</th><th>Top fails</th></tr></thead><tbody id="cl-body"></tbody></table>
+<div id="cleaner-detail" style="display:none;margin-top:16px;background:#fff;border-radius:8px;border:.5px solid #e5e5e5;box-shadow:0 2px 8px rgba(0,0,0,.08);overflow:hidden">
+  <div style="background:#1a1a1a;color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+    <span id="cd-name" style="font-size:14px;font-weight:700"></span>
+    <span id="cd-prop" style="font-size:11px;color:#aaa;margin-left:10px"></span>
+    <button onclick="document.getElementById('cleaner-detail').style.display='none'" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:18px;margin-left:auto">&#x2715;</button>
+  </div>
+  <div style="padding:16px">
+    <div id="cd-summary" style="background:#f8f8f6;border-left:3px solid #0d9488;border-radius:0 6px 6px 0;padding:12px 14px;margin-bottom:16px;font-size:12px;line-height:1.6;color:#374151;min-height:48px">
+      <span id="cd-summary-text" style="color:#aaa;font-style:italic">Click a cleaner to see analysis…</span>
+    </div>
+    <div id="cd-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">NPS breakdown</div>
+        <div id="cd-nps-bar"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Top fails + vs property avg</div>
+        <div id="cd-fails"></div>
+        <div id="cd-vs-avg" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div id="tab-ratings" class="content">
+  <div class="filters"><button class="filter-btn active" onclick="frt('all',this)">All</button><button class="filter-btn" onclick="frt('Numa',this)">Numa</button><button class="filter-btn" onclick="frt('LSA',this)">LSA</button>
+    <select id="rat-metric" onchange="bldRat()" style="margin-left:8px;padding:4px 8px;border:1px solid #ddd;border-radius:4px;font-size:11px"><option value="overall">Overall rating</option><option value="cleanliness">Cleanliness rating</option></select>
+  </div>
+  <table id="rat-tbl"><thead id="rat-head"></thead><tbody id="rat-body"></tbody></table>
+</div>
+<div id="tab-inspections" class="content">
+  <div class="note">Rooms inspected per property per month (Apr–Jun 2026). Callbacks: Anjos &amp; Rato from Google Sheets.</div>
+  <div class="filters"><button class="filter-btn active" onclick="fip('all',this)">All</button><button class="filter-btn" onclick="fip('Numa',this)">Numa</button><button class="filter-btn" onclick="fip('LSA',this)">LSA</button></div>
+  <table id="ip-tbl"><thead id="ip-head"></thead><tbody id="ip-body"></tbody></table>
+</div>
+<div id="tab-callbacks" class="content">
+  <div class="filters"><button class="filter-btn active" onclick="fcb('all',this)">All</button><button class="filter-btn" onclick="fcb('Anjos',this)">Anjos</button><button class="filter-btn" onclick="fcb('Rato',this)">Rato</button></div>
+  <div class="slbl" style="margin-bottom:8px;padding:0 0 0 2px">Top failing checklist questions · Anjos &amp; Rato</div>
+  <table><thead><tr><th>Property</th><th>Checklist question</th><th style="text-align:center">Failures</th><th>Bar</th></tr></thead><tbody id="cb-body"></tbody></table>
+</div>
+<div id="tab-units" class="content">
+  <div class="note" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;margin-bottom:10px">
+    Unit-level NPS from checkout feedback · 90 days · min 3 responses
+    <span style="float:right;font-size:10px;color:#555">🟢 ≥60 · 🟡 40–59 · 🔴 &lt;40 · ⬛ negative</span>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="font-size:11px;color:#888;padding:4px 0;align-self:center">Property:</span>
+    <div id="unit-prop-filters" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px">
+    <span style="font-size:11px;color:#888;padding:4px 0;align-self:center">Show:</span>
+    <button class="filter-btn active" id="us-all" onclick="setUS('all',this)">All units</button>
+    <button class="filter-btn" id="us-bad" onclick="setUS('bad',this)">NPS &lt; 40</button>
+    <button class="filter-btn" id="us-neg" onclick="setUS('neg',this)">Negative only</button>
+  </div>
+  <table>
+    <thead><tr>
+      <th style="width:28px"></th><th>Property</th><th>Unit</th>
+      <th style="text-align:center">NPS (90d)</th>
+      <th style="text-align:center">vs property</th>
+      <th style="text-align:center">Responses</th>
+    </tr></thead>
+    <tbody id="unit-body"></tbody>
+  </table>
+</div>
+<div id="tab-delays" class="content">
+  <div class="filters"><button class="filter-btn active" onclick="fdl('all',this)">All</button><button class="filter-btn" onclick="fdl('Numa',this)">Numa</button><button class="filter-btn" onclick="fdl('LSA',this)">LSA</button></div>
+  <div class="slbl" style="margin-bottom:8px">Delay heatmap · 22–28 Jun 2026 · 4-week avg in (parentheses)</div>
+  <table id="dl-tbl"><thead><tr><th style="width:28px"></th><th>Property</th><th class="mhdr">Mon</th><th class="mhdr">Tue</th><th class="mhdr">Wed</th><th class="mhdr">Thu</th><th class="mhdr">Fri</th><th class="mhdr">Sat</th><th class="mhdr">Sun</th><th class="mhdr">Overall</th></tr></thead><tbody id="dl-body"></tbody></table>
+</div>
+<div id="tab-delay-monthly" class="content">
+  <div class="filters"><button class="filter-btn active" onclick="fmth('all',this)">All</button><button class="filter-btn" onclick="fmth('Numa',this)">Numa</button><button class="filter-btn" onclick="fmth('LSA',this)">LSA</button></div>
+  <div class="slbl" style="margin-bottom:8px">% rooms where cleaner finished after 15:00 · Jan–Jun 2026</div>
+  <table id="mth-tbl"><thead id="mth-head"></thead><tbody id="mth-body"></tbody></table>
+</div>
+<div id="tab-guest-themes" class="content">
+  <div class="note" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;margin-bottom:12px">
+    Glass / Chattermill review themes · cleaning-relevant categories only · 90-day window · as of 2026-06-10<br>
+    <span style="font-size:10px;color:#555">Categories: Housekeeping Issues, Room Overall, Maintenance Issues, Bathroom, Bedroom &amp; Main Room, Temp/AC</span>
+  </div>
+  <div class="filters">
+    <button class="filter-btn active" onclick="fgt('all',this)">All</button>
+    <button class="filter-btn" onclick="fgt('Numa',this)">Numa</button>
+    <button class="filter-btn" onclick="fgt('LSA',this)">LSA</button>
+  </div>
+  <table id="gt-tbl">
+    <thead><tr>
+      <th style="width:28px"></th>
+      <th>Property / Theme</th>
+      <th style="text-align:center;width:90px">Neg mentions</th>
+      <th style="width:120px">Volume</th>
+      <th style="text-align:center;width:80px">Net Sentiment</th>
+    </tr></thead>
+    <tbody id="gt-body"></tbody>
+  </table>
+</div>
+</div>
+
+<script>
+const WEEK_DATA={"Lisbon Anjos":{"Monday":{"t":32,"d":16,"pct":50},"Tuesday":{"t":18,"d":7,"pct":39},"Wednesday":{"t":18,"d":6,"pct":33},"Thursday":{"t":19,"d":5,"pct":26},"Friday":{"t":15,"d":3,"pct":20},"Saturday":{"t":17,"d":4,"pct":24},"Sunday":{"t":19,"d":6,"pct":32}},"Lisbon Rato":{"Monday":{"t":29,"d":9,"pct":31},"Tuesday":{"t":18,"d":6,"pct":33},"Wednesday":{"t":16,"d":6,"pct":38},"Thursday":{"t":20,"d":5,"pct":25},"Friday":{"t":20,"d":6,"pct":30},"Saturday":{"t":14,"d":1,"pct":7},"Sunday":{"t":26,"d":6,"pct":23}},"LSA Alvalade by Numa":{"Monday":{"t":60,"d":14,"pct":23},"Tuesday":{"t":65,"d":20,"pct":31},"Wednesday":{"t":74,"d":15,"pct":20},"Thursday":{"t":73,"d":42,"pct":58},"Friday":{"t":73,"d":12,"pct":16},"Saturday":{"t":69,"d":20,"pct":29},"Sunday":{"t":75,"d":19,"pct":25}},"LSA Ascensor da Bica by Numa":{"Monday":{"t":21,"d":12,"pct":57},"Tuesday":{"t":23,"d":11,"pct":48},"Wednesday":{"t":22,"d":14,"pct":64},"Thursday":{"t":22,"d":15,"pct":68},"Friday":{"t":22,"d":15,"pct":68},"Saturday":{"t":22,"d":3,"pct":14},"Sunday":{"t":21,"d":6,"pct":29}},"LSA Avenida by Numa":{"Monday":{"t":11,"d":8,"pct":73},"Tuesday":{"t":12,"d":2,"pct":17},"Wednesday":{"t":11,"d":9,"pct":82},"Thursday":{"t":10,"d":1,"pct":10},"Friday":{"t":11,"d":2,"pct":18},"Saturday":{"t":11,"d":4,"pct":36},"Sunday":{"t":11,"d":3,"pct":27}},"LSA Bairro Alto by Numa":{"Monday":{"t":7,"d":0,"pct":0},"Tuesday":{"t":7,"d":1,"pct":14},"Wednesday":{"t":7,"d":4,"pct":57},"Thursday":{"t":6,"d":1,"pct":17},"Friday":{"t":7,"d":2,"pct":29},"Saturday":{"t":7,"d":3,"pct":43},"Sunday":{"t":7,"d":0,"pct":0}},"LSA Baixa Castelo by Numa":{"Monday":{"t":16,"d":1,"pct":6},"Tuesday":{"t":18,"d":14,"pct":78},"Wednesday":{"t":17,"d":13,"pct":76},"Thursday":{"t":15,"d":8,"pct":53},"Friday":{"t":17,"d":9,"pct":53},"Saturday":{"t":15,"d":11,"pct":73},"Sunday":{"t":14,"d":7,"pct":50}},"LSA Baixa Chiado by Numa":{"Monday":{"t":12,"d":6,"pct":50},"Tuesday":{"t":12,"d":9,"pct":75},"Wednesday":{"t":13,"d":6,"pct":46},"Thursday":{"t":11,"d":2,"pct":18},"Friday":{"t":13,"d":10,"pct":77},"Saturday":{"t":12,"d":8,"pct":67},"Sunday":{"t":12,"d":5,"pct":42}},"LSA Benformoso by Numa":{"Monday":{"t":11,"d":9,"pct":82},"Tuesday":{"t":7,"d":5,"pct":71},"Wednesday":{"t":7,"d":0,"pct":0},"Thursday":{"t":7,"d":6,"pct":86},"Friday":{"t":7,"d":5,"pct":71},"Saturday":{"t":7,"d":0,"pct":0},"Sunday":{"t":9,"d":5,"pct":56}},"LSA Campos by Numa":{"Monday":{"t":27,"d":18,"pct":67},"Tuesday":{"t":32,"d":25,"pct":78},"Wednesday":{"t":33,"d":25,"pct":76},"Thursday":{"t":31,"d":14,"pct":45},"Friday":{"t":31,"d":20,"pct":65},"Saturday":{"t":33,"d":24,"pct":73},"Sunday":{"t":35,"d":17,"pct":49}},"LSA Castelo S. Jorge by Numa":{"Thursday":{"t":3,"d":3,"pct":100},"Saturday":{"t":7,"d":4,"pct":57},"Sunday":{"t":6,"d":5,"pct":83}},"LSA Chiado Emenda by Numa":{"Monday":{"t":25,"d":20,"pct":80},"Tuesday":{"t":25,"d":13,"pct":52},"Wednesday":{"t":21,"d":17,"pct":81},"Thursday":{"t":20,"d":15,"pct":75},"Friday":{"t":19,"d":12,"pct":63},"Saturday":{"t":20,"d":14,"pct":70},"Sunday":{"t":20,"d":10,"pct":50}},"LSA Estrela by Numa":{"Monday":{"t":10,"d":5,"pct":50},"Tuesday":{"t":11,"d":7,"pct":64},"Wednesday":{"t":10,"d":2,"pct":20},"Thursday":{"t":11,"d":2,"pct":18},"Friday":{"t":12,"d":8,"pct":67},"Saturday":{"t":13,"d":2,"pct":15},"Sunday":{"t":13,"d":8,"pct":62}},"LSA Liberdade by Numa":{"Monday":{"t":31,"d":13,"pct":42},"Tuesday":{"t":30,"d":25,"pct":83},"Wednesday":{"t":35,"d":26,"pct":74},"Thursday":{"t":32,"d":14,"pct":44},"Friday":{"t":30,"d":12,"pct":40},"Saturday":{"t":29,"d":22,"pct":76},"Sunday":{"t":35,"d":10,"pct":29}},"LSA Madalena by Numa":{"Monday":{"t":17,"d":17,"pct":100},"Tuesday":{"t":20,"d":11,"pct":55},"Wednesday":{"t":22,"d":13,"pct":59},"Thursday":{"t":19,"d":13,"pct":68},"Friday":{"t":17,"d":9,"pct":53},"Saturday":{"t":16,"d":10,"pct":62},"Sunday":{"t":16,"d":5,"pct":31}},"LSA Mouraria by Numa":{"Monday":{"t":14,"d":7,"pct":50},"Tuesday":{"t":11,"d":11,"pct":100},"Wednesday":{"t":14,"d":12,"pct":86},"Thursday":{"t":15,"d":10,"pct":67},"Friday":{"t":18,"d":7,"pct":39},"Saturday":{"t":18,"d":12,"pct":67},"Sunday":{"t":19,"d":12,"pct":63}},"LSA Palácio Camões by Numa":{"Monday":{"t":7,"d":1,"pct":14},"Tuesday":{"t":6,"d":1,"pct":17},"Wednesday":{"t":6,"d":0,"pct":0},"Thursday":{"t":6,"d":3,"pct":50},"Friday":{"t":6,"d":2,"pct":33},"Saturday":{"t":7,"d":4,"pct":57},"Sunday":{"t":7,"d":2,"pct":29}},"LSA Parque by Numa":{"Monday":{"t":8,"d":6,"pct":75},"Tuesday":{"t":5,"d":5,"pct":100},"Wednesday":{"t":9,"d":0,"pct":0},"Thursday":{"t":8,"d":6,"pct":75},"Friday":{"t":10,"d":7,"pct":70},"Saturday":{"t":9,"d":3,"pct":33},"Sunday":{"t":10,"d":5,"pct":50}},"LSA Principe Real by Numa":{"Monday":{"t":16,"d":13,"pct":81},"Tuesday":{"t":17,"d":13,"pct":76},"Wednesday":{"t":16,"d":9,"pct":56},"Thursday":{"t":13,"d":10,"pct":77},"Friday":{"t":16,"d":11,"pct":69},"Saturday":{"t":15,"d":9,"pct":60},"Sunday":{"t":17,"d":9,"pct":53}},"LSA Restauradores by Numa":{"Monday":{"t":18,"d":9,"pct":50},"Tuesday":{"t":15,"d":1,"pct":7},"Wednesday":{"t":18,"d":9,"pct":50},"Thursday":{"t":16,"d":13,"pct":81},"Friday":{"t":17,"d":10,"pct":59},"Saturday":{"t":19,"d":8,"pct":42},"Sunday":{"t":18,"d":11,"pct":61}},"LSA Santos by Numa":{"Monday":{"t":25,"d":6,"pct":24},"Tuesday":{"t":26,"d":19,"pct":73},"Wednesday":{"t":26,"d":15,"pct":58},"Thursday":{"t":24,"d":13,"pct":54},"Friday":{"t":25,"d":14,"pct":56},"Saturday":{"t":22,"d":7,"pct":32},"Sunday":{"t":25,"d":16,"pct":64}}};
+const ROLL4_DATA={"Lisbon Anjos":{"Monday":42,"Tuesday":39,"Wednesday":40,"Thursday":29,"Friday":34,"Saturday":35,"Sunday":31},"Lisbon Rato":{"Monday":34,"Tuesday":24,"Wednesday":38,"Thursday":38,"Friday":30,"Saturday":31,"Sunday":27},"LSA Alvalade by Numa":{"Monday":46,"Tuesday":46,"Wednesday":32,"Thursday":58,"Friday":26,"Saturday":31,"Sunday":32},"LSA Ascensor da Bica by Numa":{"Monday":48,"Tuesday":39,"Wednesday":67,"Thursday":54,"Friday":42,"Saturday":37,"Sunday":43},"LSA Avenida by Numa":{"Monday":44,"Tuesday":31,"Wednesday":37,"Thursday":24,"Friday":13,"Saturday":28,"Sunday":34},"LSA Bairro Alto by Numa":{"Monday":4,"Tuesday":35,"Wednesday":23,"Thursday":21,"Friday":55,"Saturday":23,"Sunday":25},"LSA Baixa Castelo by Numa":{"Monday":47,"Tuesday":64,"Wednesday":60,"Thursday":61,"Friday":54,"Saturday":65,"Sunday":52},"LSA Baixa Chiado by Numa":{"Monday":55,"Tuesday":70,"Wednesday":62,"Thursday":44,"Friday":70,"Saturday":46,"Sunday":45},"LSA Benformoso by Numa":{"Monday":82,"Tuesday":71,"Wednesday":50,"Thursday":93,"Friday":52,"Saturday":44,"Sunday":56},"LSA Campos by Numa":{"Monday":61,"Tuesday":72,"Wednesday":71,"Thursday":50,"Friday":64,"Saturday":74,"Sunday":61},"LSA Castelo S. Jorge by Numa":{"Thursday":100,"Saturday":57,"Sunday":83},"LSA Chiado Emenda by Numa":{"Monday":70,"Tuesday":42,"Wednesday":55,"Thursday":58,"Friday":54,"Saturday":32,"Sunday":50},"LSA Estrela by Numa":{"Monday":56,"Tuesday":50,"Wednesday":27,"Thursday":44,"Friday":62,"Saturday":53,"Sunday":56},"LSA Liberdade by Numa":{"Monday":49,"Tuesday":81,"Wednesday":64,"Thursday":36,"Friday":46,"Saturday":64,"Sunday":49},"LSA Madalena by Numa":{"Monday":59,"Tuesday":55,"Wednesday":45,"Thursday":59,"Friday":48,"Saturday":64,"Sunday":40},"LSA Mouraria by Numa":{"Monday":60,"Tuesday":70,"Wednesday":57,"Thursday":74,"Friday":52,"Saturday":72,"Sunday":61},"LSA Palácio Camões by Numa":{"Monday":17,"Tuesday":42,"Wednesday":27,"Thursday":30,"Friday":31,"Saturday":22,"Sunday":24},"LSA Parque by Numa":{"Monday":52,"Tuesday":50,"Wednesday":26,"Thursday":53,"Friday":50,"Saturday":73,"Sunday":33},"LSA Principe Real by Numa":{"Monday":71,"Tuesday":64,"Wednesday":58,"Thursday":67,"Friday":61,"Saturday":67,"Sunday":58},"LSA Restauradores by Numa":{"Monday":47,"Tuesday":9,"Wednesday":24,"Thursday":69,"Friday":36,"Saturday":52,"Sunday":53},"LSA Santos by Numa":{"Monday":40,"Tuesday":59,"Wednesday":63,"Thursday":53,"Friday":51,"Saturday":55,"Sunday":68}};
+const MTHLY_DATA={"Lisbon Anjos":{"city":"Lisbon","2026-01":41,"2026-02":44,"2026-03":34,"2026-04":38,"2026-05":43,"2026-06":37},"Lisbon Rato":{"city":"Lisbon","2026-01":34,"2026-02":30,"2026-03":36,"2026-04":33,"2026-05":35,"2026-06":32},"LSA Alvalade by Numa":{"city":"Lisbon","2026-01":23,"2026-02":26,"2026-03":27,"2026-04":29,"2026-05":42,"2026-06":38},"LSA Ascensor da Bica by Numa":{"city":"Lisbon","2026-03":44,"2026-04":31,"2026-05":48,"2026-06":47},"LSA Avenida by Numa":{"city":"Lisbon","2026-02":24,"2026-03":40,"2026-04":53,"2026-05":45,"2026-06":29},"LSA Bairro Alto by Numa":{"city":"Lisbon","2026-01":23,"2026-02":24,"2026-03":22,"2026-04":17,"2026-05":14,"2026-06":26},"LSA Baixa Castelo by Numa":{"city":"Lisbon","2026-03":66,"2026-04":67,"2026-05":54,"2026-06":57},"LSA Baixa Chiado by Numa":{"city":"Lisbon","2026-05":48,"2026-06":55},"LSA Benformoso by Numa":{"city":"Lisbon","2026-06":59},"LSA Campos by Numa":{"city":"Lisbon","2026-02":50,"2026-03":61,"2026-04":63,"2026-05":65,"2026-06":64},"LSA Castelo S. Jorge by Numa":{"city":"Lisbon","2026-06":75},"LSA Chiado Emenda by Numa":{"city":"Lisbon","2026-03":38,"2026-04":37,"2026-05":52,"2026-06":51},"LSA Estrela by Numa":{"city":"Lisbon","2026-06":50},"LSA Liberdade by Numa":{"city":"Lisbon","2026-01":38,"2026-02":62,"2026-03":65,"2026-04":68,"2026-05":69,"2026-06":54},"LSA Madalena by Numa":{"city":"Lisbon","2026-04":72,"2026-05":59,"2026-06":53},"LSA Mouraria by Numa":{"city":"Lisbon","2026-04":18,"2026-05":61,"2026-06":63},"LSA Palácio Camões by Numa":{"city":"Lisbon","2026-05":31,"2026-06":27},"LSA Parque by Numa":{"city":"Lisbon","2026-05":48,"2026-06":47},"LSA Principe Real by Numa":{"city":"Lisbon","2026-04":66,"2026-05":62,"2026-06":63},"LSA Restauradores by Numa":{"city":"Lisbon","2026-02":40,"2026-03":41,"2026-04":51,"2026-05":51,"2026-06":42},"LSA Santos by Numa":{"city":"Lisbon","2026-03":35,"2026-04":30,"2026-05":42,"2026-06":55}};
+const DLY_PROPS=["LSA Alvalade by Numa","LSA Ascensor da Bica by Numa","LSA Avenida by Numa","LSA Bairro Alto by Numa","LSA Baixa Castelo by Numa","LSA Baixa Chiado by Numa","LSA Benformoso by Numa","LSA Campos by Numa","LSA Castelo S. Jorge by Numa","LSA Chiado Emenda by Numa","LSA Estrela by Numa","LSA Liberdade by Numa","LSA Madalena by Numa","LSA Mouraria by Numa","LSA Palácio Camões by Numa","LSA Parque by Numa","LSA Principe Real by Numa","LSA Restauradores by Numa","LSA Santos by Numa","Lisbon Anjos","Lisbon Rato"];
+const DLY_CITIES={"LSA Alvalade by Numa":"Lisbon","LSA Ascensor da Bica by Numa":"Lisbon","LSA Avenida by Numa":"Lisbon","LSA Bairro Alto by Numa":"Lisbon","LSA Baixa Castelo by Numa":"Lisbon","LSA Baixa Chiado by Numa":"Lisbon","LSA Benformoso by Numa":"Lisbon","LSA Campos by Numa":"Lisbon","LSA Castelo S. Jorge by Numa":"Lisbon","LSA Chiado Emenda by Numa":"Lisbon","LSA Estrela by Numa":"Lisbon","LSA Liberdade by Numa":"Lisbon","LSA Madalena by Numa":"Lisbon","LSA Mouraria by Numa":"Lisbon","LSA Palácio Camões by Numa":"Lisbon","LSA Parque by Numa":"Lisbon","LSA Principe Real by Numa":"Lisbon","LSA Restauradores by Numa":"Lisbon","LSA Santos by Numa":"Lisbon","Lisbon Anjos":"Lisbon","Lisbon Rato":"Lisbon"};
+const DLY_BRAND={"LSA Alvalade by Numa":"LSA","LSA Ascensor da Bica by Numa":"LSA","LSA Avenida by Numa":"LSA","LSA Bairro Alto by Numa":"LSA","LSA Baixa Castelo by Numa":"LSA","LSA Baixa Chiado by Numa":"LSA","LSA Benformoso by Numa":"LSA","LSA Campos by Numa":"LSA","LSA Castelo S. Jorge by Numa":"LSA","LSA Chiado Emenda by Numa":"LSA","LSA Estrela by Numa":"LSA","LSA Liberdade by Numa":"LSA","LSA Madalena by Numa":"LSA","LSA Mouraria by Numa":"LSA","LSA Palácio Camões by Numa":"LSA","LSA Parque by Numa":"LSA","LSA Principe Real by Numa":"LSA","LSA Restauradores by Numa":"LSA","LSA Santos by Numa":"LSA","Lisbon Anjos":"Numa","Lisbon Rato":"Numa"};
+const DLY_MONTHS=["2026-01","2026-02","2026-03","2026-04","2026-05","2026-06"];
+const OTA_DATA={"LSA Chiado Emenda by Numa":{"2026-07":{"overall":8.6,"cleanliness":10,"n":5},"2026-06":{"overall":8.312,"cleanliness":8.5,"n":157},"2026-05":{"overall":8.358,"cleanliness":8.679,"n":137},"2026-04":{"overall":8.18,"cleanliness":7.759,"n":133},"2026-03":{"overall":8.398,"cleanliness":8.846,"n":103}},"LSA Santos by Numa":{"2026-07":{"overall":9,"cleanliness":null,"n":1},"2026-06":{"overall":8.431,"cleanliness":8.603,"n":144},"2026-05":{"overall":8,"cleanliness":8.125,"n":151},"2026-04":{"overall":8.179,"cleanliness":8.837,"n":145},"2026-03":{"overall":8.621,"cleanliness":10,"n":29}},"LSA Restauradores by Numa":{"2026-07":{"overall":7.2,"cleanliness":10,"n":5},"2026-06":{"overall":8.5,"cleanliness":9.059,"n":126},"2026-05":{"overall":8.382,"cleanliness":8.316,"n":110},"2026-04":{"overall":8.368,"cleanliness":8.065,"n":114},"2026-03":{"overall":8.282,"cleanliness":8.125,"n":124},"2026-02":{"overall":8.472,"cleanliness":8.409,"n":36}},"LSA Principe Real by Numa":{"2026-07":{"overall":7,"cleanliness":null,"n":3},"2026-06":{"overall":8.521,"cleanliness":9.194,"n":117},"2026-05":{"overall":8.095,"cleanliness":8.121,"n":95},"2026-04":{"overall":7.645,"cleanliness":8.125,"n":31}},"LSA Parque by Numa":{"2026-07":{"overall":9.5,"cleanliness":7.5,"n":2},"2026-06":{"overall":7.864,"cleanliness":8.125,"n":59},"2026-05":{"overall":7.739,"cleanliness":7.5,"n":23}},"LSA Palácio Camões by Numa":{"2026-07":{"overall":9.5,"cleanliness":null,"n":2},"2026-06":{"overall":7.833,"cleanliness":7.222,"n":36},"2026-05":{"overall":6.522,"cleanliness":5,"n":23}},"LSA Mouraria by Numa":{"2026-07":{"overall":7.25,"cleanliness":null,"n":4},"2026-06":{"overall":8.082,"cleanliness":8.82,"n":98},"2026-05":{"overall":8.39,"cleanliness":9.125,"n":77}},"LSA Madalena by Numa":{"2026-07":{"overall":8,"cleanliness":null,"n":1},"2026-06":{"overall":8.414,"cleanliness":8.722,"n":116},"2026-05":{"overall":8.099,"cleanliness":8.571,"n":101},"2026-04":{"overall":5.286,"cleanliness":5,"n":14}},"LSA Liberdade by Numa":{"2026-07":{"overall":8.333,"cleanliness":null,"n":3},"2026-06":{"overall":8.615,"cleanliness":8.521,"n":200},"2026-05":{"overall":8.723,"cleanliness":8.989,"n":166},"2026-04":{"overall":8.518,"cleanliness":9.113,"n":255},"2026-03":{"overall":8.804,"cleanliness":8.886,"n":240},"2026-02":{"overall":8.651,"cleanliness":8.904,"n":169},"2026-01":{"overall":10,"cleanliness":null,"n":5}},"LSA Estrela by Numa":{"2026-07":{"overall":5,"cleanliness":2.5,"n":2},"2026-06":{"overall":7.5,"cleanliness":7.143,"n":44}},"LSA Castelo S. Jorge by Numa":{"2026-07":{"overall":9,"cleanliness":null,"n":1},"2026-06":{"overall":6,"cleanliness":null,"n":3}},"LSA Campos by Numa":{"2026-07":{"overall":8,"cleanliness":null,"n":1},"2026-06":{"overall":8.005,"cleanliness":8.092,"n":209},"2026-05":{"overall":7.948,"cleanliness":8.194,"n":232},"2026-04":{"overall":7.82,"cleanliness":8.16,"n":255},"2026-03":{"overall":8.206,"cleanliness":8.446,"n":209},"2026-02":{"overall":7.4,"cleanliness":null,"n":5}},"LSA Baixa Chiado by Numa":{"2026-07":{"overall":8.2,"cleanliness":10,"n":5},"2026-06":{"overall":8.538,"cleanliness":8.929,"n":65},"2026-05":{"overall":7.758,"cleanliness":7.75,"n":33}},"LSA Baixa Castelo by Numa":{"2026-07":{"overall":7.8,"cleanliness":null,"n":5},"2026-06":{"overall":7.649,"cleanliness":6.333,"n":97},"2026-05":{"overall":8.018,"cleanliness":8.214,"n":110},"2026-04":{"overall":8.535,"cleanliness":8.241,"n":101},"2026-03":{"overall":7.828,"cleanliness":8.333,"n":58}},"LSA Bairro Alto by Numa":{"2026-07":{"overall":9.5,"cleanliness":10,"n":2},"2026-06":{"overall":8.75,"cleanliness":8.909,"n":48},"2026-05":{"overall":8.712,"cleanliness":8.8,"n":52},"2026-04":{"overall":8.146,"cleanliness":8.765,"n":48},"2026-03":{"overall":8.909,"cleanliness":8.958,"n":44},"2026-02":{"overall":8.879,"cleanliness":9.375,"n":33},"2026-01":{"overall":7.946,"cleanliness":8.833,"n":37},"2025-12":{"overall":7.571,"cleanliness":7.647,"n":42}},"LSA Avenida by Numa":{"2026-07":{"overall":8.5,"cleanliness":null,"n":2},"2026-06":{"overall":8.58,"cleanliness":8.455,"n":81},"2026-05":{"overall":7.966,"cleanliness":8.438,"n":59},"2026-04":{"overall":8.5,"cleanliness":8.636,"n":64},"2026-03":{"overall":8.183,"cleanliness":9.062,"n":60},"2026-02":{"overall":8.944,"cleanliness":10,"n":18}},"LSA Ascensor da Bica by Numa":{"2026-07":{"overall":9,"cleanliness":null,"n":1},"2026-06":{"overall":7.844,"cleanliness":8.194,"n":180},"2026-05":{"overall":7.953,"cleanliness":8.393,"n":171},"2026-04":{"overall":8.51,"cleanliness":7.738,"n":102},"2026-03":{"overall":8.25,"cleanliness":10,"n":16}},"LSA Alvalade by Numa":{"2026-07":{"overall":6.727,"cleanliness":6.667,"n":11},"2026-06":{"overall":8.072,"cleanliness":8.321,"n":501},"2026-05":{"overall":8.122,"cleanliness":8.563,"n":492},"2026-04":{"overall":8.099,"cleanliness":8.585,"n":487},"2026-03":{"overall":8.283,"cleanliness":8.735,"n":438},"2026-02":{"overall":8.48,"cleanliness":8.902,"n":444},"2026-01":{"overall":8.624,"cleanliness":8.958,"n":141}},"Lisbon Rato":{"2026-07":{"overall":9.619,"cleanliness":null,"n":21},"2026-06":{"overall":8.991,"cleanliness":9.312,"n":422},"2026-05":{"overall":8.981,"cleanliness":9.006,"n":473},"2026-04":{"overall":9.131,"cleanliness":9.489,"n":550},"2026-03":{"overall":9.22,"cleanliness":9.193,"n":505},"2026-02":{"overall":9.201,"cleanliness":9.387,"n":468},"2026-01":{"overall":9.091,"cleanliness":9.348,"n":525},"2025-12":{"overall":9.169,"cleanliness":9.241,"n":509},"2025-11":{"overall":9.032,"cleanliness":9.312,"n":437},"2025-10":{"overall":8.949,"cleanliness":9.319,"n":506},"2025-09":{"overall":8.905,"cleanliness":9.388,"n":464},"2025-08":{"overall":9.013,"cleanliness":9.731,"n":465}},"Lisbon Anjos":{"2026-07":{"overall":9.056,"cleanliness":8.75,"n":18},"2026-06":{"overall":8.921,"cleanliness":9.289,"n":431},"2026-05":{"overall":9,"cleanliness":9.125,"n":416},"2026-04":{"overall":9.137,"cleanliness":9.475,"n":476},"2026-03":{"overall":9.203,"cleanliness":9.404,"n":472},"2026-02":{"overall":9.262,"cleanliness":9.438,"n":484},"2026-01":{"overall":9.189,"cleanliness":9.466,"n":434},"2025-12":{"overall":9.192,"cleanliness":9.651,"n":474},"2025-11":{"overall":9.181,"cleanliness":9.318,"n":425},"2025-10":{"overall":8.843,"cleanliness":9.092,"n":470},"2025-09":{"overall":8.885,"cleanliness":9.279,"n":452},"2025-08":{"overall":8.906,"cleanliness":9.383,"n":427}},"LSA Benformoso by Numa":{"2026-06":{"overall":6.5,"cleanliness":null,"n":10}}};
+const OTA_MONTHS=["2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07"];
+const OTA_PROPS=["LSA Alvalade by Numa","LSA Ascensor da Bica by Numa","LSA Avenida by Numa","LSA Bairro Alto by Numa","LSA Baixa Castelo by Numa","LSA Baixa Chiado by Numa","LSA Benformoso by Numa","LSA Campos by Numa","LSA Castelo S. Jorge by Numa","LSA Chiado Emenda by Numa","LSA Estrela by Numa","LSA Liberdade by Numa","LSA Madalena by Numa","LSA Mouraria by Numa","LSA Palácio Camões by Numa","LSA Parque by Numa","LSA Principe Real by Numa","LSA Restauradores by Numa","LSA Santos by Numa","Lisbon Anjos","Lisbon Rato"];
+const INSP_DATA={"Lisbon Anjos":{"2026-07":{"to_inspection":5,"end_cleaning":0},"2026-06":{"to_inspection":518,"end_cleaning":0},"2026-05":{"to_inspection":494,"end_cleaning":0}},"LSA Santos by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":545,"end_cleaning":0},"2026-05":{"to_inspection":501,"end_cleaning":0}},"LSA Parque by Numa":{"2026-07":{"to_inspection":1,"end_cleaning":0},"2026-06":{"to_inspection":83,"end_cleaning":0},"2026-05":{"to_inspection":40,"end_cleaning":0}},"LSA Palácio Camões by Numa":{"2026-07":{"to_inspection":1,"end_cleaning":0},"2026-06":{"to_inspection":138,"end_cleaning":0},"2026-05":{"to_inspection":94,"end_cleaning":0}},"LSA Mouraria by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":285,"end_cleaning":0},"2026-05":{"to_inspection":283,"end_cleaning":0}},"LSA Madalena by Numa":{"2026-07":{"to_inspection":5,"end_cleaning":0},"2026-06":{"to_inspection":472,"end_cleaning":0},"2026-05":{"to_inspection":447,"end_cleaning":0}},"LSA Liberdade by Numa":{"2026-07":{"to_inspection":4,"end_cleaning":0},"2026-06":{"to_inspection":396,"end_cleaning":0},"2026-05":{"to_inspection":290,"end_cleaning":0}},"LSA Estrela by Numa":{"2026-07":{"to_inspection":2,"end_cleaning":0},"2026-06":{"to_inspection":259,"end_cleaning":0}},"LSA Chiado Emenda by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":345,"end_cleaning":0},"2026-05":{"to_inspection":271,"end_cleaning":0}},"LSA Campos by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":679,"end_cleaning":0},"2026-05":{"to_inspection":761,"end_cleaning":0}},"LSA Benformoso by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":60,"end_cleaning":0}},"LSA Baixa Castelo by Numa":{"2026-07":{"to_inspection":4,"end_cleaning":0},"2026-06":{"to_inspection":453,"end_cleaning":0},"2026-05":{"to_inspection":481,"end_cleaning":0}},"LSA Bairro Alto by Numa":{"2026-07":{"to_inspection":1,"end_cleaning":0},"2026-06":{"to_inspection":111,"end_cleaning":0},"2026-05":{"to_inspection":158,"end_cleaning":0}},"LSA Ascensor da Bica by Numa":{"2026-07":{"to_inspection":4,"end_cleaning":0},"2026-06":{"to_inspection":571,"end_cleaning":0},"2026-05":{"to_inspection":419,"end_cleaning":0}},"LSA Alvalade by Numa":{"2026-07":{"to_inspection":3,"end_cleaning":0},"2026-06":{"to_inspection":328,"end_cleaning":0},"2026-05":{"to_inspection":703,"end_cleaning":0}},"Lisbon Rato":{"2026-07":{"to_inspection":4,"end_cleaning":0},"2026-06":{"to_inspection":563,"end_cleaning":0},"2026-05":{"to_inspection":578,"end_cleaning":0}},"LSA Avenida by Numa":{"2026-06":{"to_inspection":152,"end_cleaning":0},"2026-05":{"to_inspection":153,"end_cleaning":0}},"LSA Baixa Chiado by Numa":{"2026-06":{"to_inspection":243,"end_cleaning":0},"2026-05":{"to_inspection":133,"end_cleaning":0}},"LSA Castelo S. Jorge by Numa":{"2026-06":{"to_inspection":9,"end_cleaning":0}},"LSA Principe Real by Numa":{"2026-06":{"to_inspection":355,"end_cleaning":0},"2026-05":{"to_inspection":289,"end_cleaning":0}},"LSA Restauradores by Numa":{"2026-06":{"to_inspection":195,"end_cleaning":0},"2026-05":{"to_inspection":243,"end_cleaning":0}}};
+const INSP_MONTHS=["2026-05","2026-06","2026-07"];
+const PORTFOLIO={"LSA Alvalade by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":30.8,"ota_overall":8.06,"ota_clean":8.39,"ota_n":null},"LSA Ascensor da Bica by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":42.5,"ota_overall":8.31,"ota_clean":8.58,"ota_n":null},"LSA Avenida by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":38.2,"ota_overall":8.45,"ota_clean":8.92,"ota_n":null},"LSA Bairro Alto by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":21.0,"ota_overall":8.55,"ota_clean":8.91,"ota_n":null},"LSA Baixa Castelo by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":61.0,"ota_overall":7.97,"ota_clean":7.78,"ota_n":null},"LSA Baixa Chiado by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":51.5,"ota_overall":8.17,"ota_clean":8.89,"ota_n":null},"LSA Benformoso by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":59.0,"ota_overall":6.5,"ota_clean":null,"ota_n":null},"LSA Campos by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":60.6,"ota_overall":7.9,"ota_clean":8.22,"ota_n":null},"LSA Castelo S. Jorge by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":75.0,"ota_overall":7.5,"ota_clean":null,"ota_n":null},"LSA Chiado Emenda by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":44.5,"ota_overall":8.37,"ota_clean":8.76,"ota_n":null},"LSA Estrela by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":50.0,"ota_overall":6.25,"ota_clean":4.82,"ota_n":null},"LSA Liberdade by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":59.3,"ota_overall":8.81,"ota_clean":8.88,"ota_n":null},"LSA Madalena by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":61.3,"ota_overall":7.45,"ota_clean":7.43,"ota_n":null},"LSA Mouraria by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":47.3,"ota_overall":7.91,"ota_clean":8.97,"ota_n":null},"LSA Palácio Camões by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":29.0,"ota_overall":7.95,"ota_clean":6.11,"ota_n":null},"LSA Parque by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":47.5,"ota_overall":8.37,"ota_clean":7.71,"ota_n":null},"LSA Principe Real by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":63.7,"ota_overall":7.82,"ota_clean":8.48,"ota_n":null},"LSA Restauradores by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":45.0,"ota_overall":8.2,"ota_clean":8.66,"ota_n":null},"LSA Santos by Numa":{"city":"Lisbon","brand":"LSA","ytd_delay":40.5,"ota_overall":8.45,"ota_clean":8.89,"ota_n":null},"Lisbon Anjos":{"city":"Lisbon","brand":"Numa","ytd_delay":39.5,"ota_overall":9.06,"ota_clean":9.31,"ota_n":null},"Lisbon Rato":{"city":"Lisbon","brand":"Numa","ytd_delay":33.3,"ota_overall":9.11,"ota_clean":9.34,"ota_n":null}};
+const CLEANERS=[{"name":"Lisangela Gomes","role":"cleaner ","property":"Lisbon Rato","cleanings":27,"clean_score":10,"n_reviews":4,"inspections":0,"callback_rate":null,"top_fails":[],"nps":67,"n_nps":24,"avg_rating":9.08,"promoters":18,"detractors":2},{"name":"Resiana Veiga","role":"cleaner ","property":"Lisbon Rato","cleanings":430,"clean_score":9.29,"n_reviews":14,"inspections":0,"callback_rate":null,"top_fails":[],"nps":72,"n_nps":501,"avg_rating":9.13,"promoters":376,"detractors":17},{"name":"Euridice Almeida","role":"cleaner ","property":"Lisbon Anjos","cleanings":1,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":66,"n_nps":470,"avg_rating":8.98,"promoters":328,"detractors":19},{"name":"Edna Gomes","role":"cleaner ","property":"Lisbon Rato","cleanings":53,"clean_score":9.5,"n_reviews":5,"inspections":0,"callback_rate":null,"top_fails":[],"nps":59,"n_nps":34,"avg_rating":8.53,"promoters":23,"detractors":3},{"name":"Vanda Tavares","role":"cleaner ","property":"Lisbon Rato","cleanings":362,"clean_score":8.92,"n_reviews":13,"inspections":0,"callback_rate":null,"top_fails":[],"nps":73,"n_nps":467,"avg_rating":9.17,"promoters":359,"detractors":20},{"name":"Katia Ferreira","role":"cleaner ","property":"Lisbon Rato","cleanings":42,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":47,"n_nps":19,"avg_rating":8.79,"promoters":10,"detractors":1},{"name":"Jovana Campos","role":"cleaner ","property":"Lisbon Rato","cleanings":95,"clean_score":10,"n_reviews":3,"inspections":0,"callback_rate":null,"top_fails":[],"nps":58,"n_nps":43,"avg_rating":8.98,"promoters":26,"detractors":1},{"name":"Aurelia Djalo","role":"cleaner ","property":"Lisbon Anjos","cleanings":143,"clean_score":9.5,"n_reviews":5,"inspections":0,"callback_rate":null,"top_fails":[],"nps":77,"n_nps":151,"avg_rating":9.19,"promoters":124,"detractors":8},{"name":"Dulceneia Pereira","role":"cleaner ","property":"Lisbon Rato","cleanings":122,"clean_score":8.93,"n_reviews":7,"inspections":0,"callback_rate":null,"top_fails":[],"nps":77,"n_nps":145,"avg_rating":9.32,"promoters":115,"detractors":4},{"name":"Conceicao Fortes","role":"cleaner ","property":"Lisbon Rato","cleanings":101,"clean_score":10,"n_reviews":4,"inspections":0,"callback_rate":null,"top_fails":[],"nps":72,"n_nps":306,"avg_rating":9.05,"promoters":234,"detractors":14},{"name":"Edsana Fernandes","role":"cleaner ","property":"Lisbon Rato","cleanings":47,"clean_score":7.5,"n_reviews":1,"inspections":0,"callback_rate":null,"top_fails":[],"nps":65,"n_nps":77,"avg_rating":9.05,"promoters":54,"detractors":4},{"name":"Camila Santos","role":"cleaner ","property":"Lisbon Rato","cleanings":63,"clean_score":8.33,"n_reviews":3,"inspections":0,"callback_rate":null,"top_fails":[],"nps":47,"n_nps":36,"avg_rating":8.06,"promoters":23,"detractors":6},{"name":"Vitoria Joaquim Sonaba","role":"cleaner ","property":"Lisbon Anjos","cleanings":13,"clean_score":10,"n_reviews":1,"inspections":0,"callback_rate":null,"top_fails":[],"nps":68,"n_nps":66,"avg_rating":9.05,"promoters":49,"detractors":4},{"name":"Joceline Lopes","role":"cleaner ","property":"Lisbon Anjos","cleanings":10,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":null,"n_nps":0,"avg_rating":null,"promoters":0,"detractors":0},{"name":"Binta Djalo","role":"cleaner ","property":"Lisbon Anjos","cleanings":31,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":88,"n_nps":8,"avg_rating":9.25,"promoters":7,"detractors":0},{"name":"Ludmila Andrade","role":"cleaner ","property":"Lisbon Rato","cleanings":1,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":60,"n_nps":5,"avg_rating":8.6,"promoters":3,"detractors":0},{"name":"Carla Lopes","role":"cleaner ","property":"Lisbon Rato","cleanings":1,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":null,"n_nps":0,"avg_rating":null,"promoters":0,"detractors":0},{"name":"Rupia Tiwari","role":"cleaner ","property":"Lisbon Rato","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":53,"n_nps":15,"avg_rating":8.4,"promoters":10,"detractors":2},{"name":"Nivalda Neto","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":86,"n_nps":22,"avg_rating":9.27,"promoters":20,"detractors":1},{"name":"Magna Souza","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":64,"n_nps":11,"avg_rating":9.27,"promoters":7,"detractors":0},{"name":"Alejandra Hernandes","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":57,"n_nps":28,"avg_rating":8.68,"promoters":18,"detractors":2},{"name":"Yolanda Cumba","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":50,"n_nps":24,"avg_rating":8.67,"promoters":15,"detractors":3},{"name":"Sandra Gazina","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":48,"n_nps":23,"avg_rating":8.39,"promoters":13,"detractors":2},{"name":"Rosilda Costa","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":44,"n_nps":27,"avg_rating":7.93,"promoters":17,"detractors":5},{"name":"David Souza","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":20,"n_nps":5,"avg_rating":8.4,"promoters":1,"detractors":0},{"name":"Nelmir Romero","role":"cleaner ","property":"LSA Alvalade","cleanings":0,"clean_score":null,"n_reviews":0,"inspections":0,"callback_rate":null,"top_fails":[],"nps":18,"n_nps":11,"avg_rating":8.0,"promoters":4,"detractors":2}];
+const INSP_CALLBACKS=[{"timestamp":"2026-04-13","unit":"206","property":"Rato","housekeeper":"","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-14","unit":"802","property":"Rato","housekeeper":"","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-14","unit":"211","property":"Anjos","housekeeper":"","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-14","unit":"503","property":"Anjos","housekeeper":"","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-14","unit":"202","property":"Anjos","housekeeper":"","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-28","unit":"103","property":"Anjos","housekeeper":"aurelia","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-28","unit":"105","property":"Anjos","housekeeper":"Aurelia","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-28","unit":"106","property":"Anjos","housekeeper":"Aurelia","reason":"No, HSK needs to come back."},{"timestamp":"2026-04-29","unit":"003","property":"Anjos","housekeeper":"Aurelia","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-16","unit":"310","property":"Rato","housekeeper":"Edna","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-18","unit":"411","property":"Anjos","housekeeper":"Katia","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-19","unit":"501","property":"Anjos","housekeeper":"Edna","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-19","unit":"507","property":"Anjos","housekeeper":"Edna","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-23","unit":"404","property":"Anjos","housekeeper":"Aurelia","reason":"No, HSK needs to come back."},{"timestamp":"2026-06-26","unit":"606","property":"Rato","housekeeper":"dulcineia","reason":"No, HSK needs to come back."},{"timestamp":"2026-07-01","unit":"806","property":"Rato","housekeeper":"Jovana","reason":"No, HSK needs to come back."}];
+const Q_FAILS=[{"question":"Is the room ready? (HSK callback required)","anjos":11,"rato":5,"total":16}];
+const UNIT_NPS={"Lisbon Anjos":{"prop_nps":67,"units":[{"unit":"","nps":67,"n":957}]},"Lisbon Rato":{"prop_nps":67,"units":[{"unit":"","nps":67,"n":1081}]},"LSA Liberdade by Numa":{"prop_nps":52,"units":[{"unit":"","nps":52,"n":406}]},"LSA Bairro Alto by Numa":{"prop_nps":52,"units":[{"unit":"","nps":52,"n":106}]},"LSA Mouraria by Numa":{"prop_nps":49,"units":[{"unit":"","nps":49,"n":122}]},"LSA Chiado Emenda by Numa":{"prop_nps":46,"units":[{"unit":"","nps":46,"n":316}]},"LSA Avenida by Numa":{"prop_nps":44,"units":[{"unit":"","nps":44,"n":162}]},"LSA Restauradores by Numa":{"prop_nps":43,"units":[{"unit":"","nps":43,"n":254}]},"LSA Santos by Numa":{"prop_nps":42,"units":[{"unit":"","nps":42,"n":313}]},"LSA Principe Real by Numa":{"prop_nps":41,"units":[{"unit":"","nps":41,"n":165}]},"LSA Baixa Castelo by Numa":{"prop_nps":40,"units":[{"unit":"","nps":40,"n":209}]},"LSA Madalena by Numa":{"prop_nps":38,"units":[{"unit":"","nps":38,"n":185}]},"LSA Baixa Chiado by Numa":{"prop_nps":38,"units":[{"unit":"","nps":38,"n":72}]},"LSA Alvalade by Numa":{"prop_nps":36,"units":[{"unit":"","nps":36,"n":931}]},"LSA Palácio Camões by Numa":{"prop_nps":34,"units":[{"unit":"","nps":34,"n":47}]},"LSA Campos by Numa":{"prop_nps":32,"units":[{"unit":"","nps":32,"n":498}]},"LSA Ascensor da Bica by Numa":{"prop_nps":31,"units":[{"unit":"","nps":31,"n":342}]},"LSA Parque by Numa":{"prop_nps":29,"units":[{"unit":"","nps":29,"n":63}]},"LSA Castelo S. Jorge by Numa":{"prop_nps":25,"units":[{"unit":"","nps":25,"n":4}]},"LSA Estrela by Numa":{"prop_nps":16,"units":[{"unit":"","nps":16,"n":38}]},"LSA Benformoso by Numa":{"prop_nps":10,"units":[{"unit":"","nps":10,"n":10}]}};
+const PROP_AVGS={"LSA Alvalade by Numa":{"avg_clean_ota":8.39,"avg_overall_ota":8.06,"avg_nps":36,"avg_rating":8.06},"LSA Ascensor da Bica by Numa":{"avg_clean_ota":8.58,"avg_overall_ota":8.31,"avg_nps":31,"avg_rating":8.31},"LSA Avenida by Numa":{"avg_clean_ota":8.92,"avg_overall_ota":8.45,"avg_nps":44,"avg_rating":8.45},"LSA Bairro Alto by Numa":{"avg_clean_ota":8.91,"avg_overall_ota":8.55,"avg_nps":52,"avg_rating":8.55},"LSA Baixa Castelo by Numa":{"avg_clean_ota":7.78,"avg_overall_ota":7.97,"avg_nps":40,"avg_rating":7.97},"LSA Baixa Chiado by Numa":{"avg_clean_ota":8.89,"avg_overall_ota":8.17,"avg_nps":38,"avg_rating":8.17},"LSA Benformoso by Numa":{"avg_clean_ota":null,"avg_overall_ota":6.5,"avg_nps":10,"avg_rating":6.5},"LSA Campos by Numa":{"avg_clean_ota":8.22,"avg_overall_ota":7.9,"avg_nps":32,"avg_rating":7.9},"LSA Castelo S. Jorge by Numa":{"avg_clean_ota":null,"avg_overall_ota":7.5,"avg_nps":25,"avg_rating":7.5},"LSA Chiado Emenda by Numa":{"avg_clean_ota":8.76,"avg_overall_ota":8.37,"avg_nps":46,"avg_rating":8.37},"LSA Estrela by Numa":{"avg_clean_ota":4.82,"avg_overall_ota":6.25,"avg_nps":16,"avg_rating":6.25},"LSA Liberdade by Numa":{"avg_clean_ota":8.88,"avg_overall_ota":8.81,"avg_nps":52,"avg_rating":8.81},"LSA Madalena by Numa":{"avg_clean_ota":7.43,"avg_overall_ota":7.45,"avg_nps":38,"avg_rating":7.45},"LSA Mouraria by Numa":{"avg_clean_ota":8.97,"avg_overall_ota":7.91,"avg_nps":49,"avg_rating":7.91},"LSA Palácio Camões by Numa":{"avg_clean_ota":6.11,"avg_overall_ota":7.95,"avg_nps":34,"avg_rating":7.95},"LSA Parque by Numa":{"avg_clean_ota":7.71,"avg_overall_ota":8.37,"avg_nps":29,"avg_rating":8.37},"LSA Principe Real by Numa":{"avg_clean_ota":8.48,"avg_overall_ota":7.82,"avg_nps":41,"avg_rating":7.82},"LSA Restauradores by Numa":{"avg_clean_ota":8.66,"avg_overall_ota":8.2,"avg_nps":43,"avg_rating":8.2},"LSA Santos by Numa":{"avg_clean_ota":8.89,"avg_overall_ota":8.45,"avg_nps":42,"avg_rating":8.45},"Lisbon Anjos":{"avg_clean_ota":9.31,"avg_overall_ota":9.06,"avg_nps":67,"avg_rating":9.06},"Lisbon Rato":{"avg_clean_ota":9.34,"avg_overall_ota":9.11,"avg_nps":67,"avg_rating":9.11}};
+const CURRENT_MONTH="2026-07";
+const GLASS_THEMES={};
+
+const WEEKDAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+function badge(p){return DLY_BRAND[p]==='Numa'?'<div class="badge badge-N">N</div>':'<div class="badge badge-L">L</div>';}
+function dc(v){if(v===null||v===undefined)return'c-grey';return v>=30?'c-red':v>=10?'c-amber':'c-green';}
+function oc(v){if(!v)return'ota-na';return v>=9?'ota-good':v>=8?'ota-mid':'ota-bad';}
+function bc(v){if(!v)return'#ddd';return v>=9?'#16a34a':v>=8?'#d97706':'#dc2626';}
+function sf(btn){btn.closest('.filters').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+function fp(brand){return brand==='all'?DLY_PROPS:DLY_PROPS.filter(p=>DLY_BRAND[p]===brand);}
+function gr(props,fn,showAgg){
+  const n=props.filter(p=>DLY_BRAND[p]==='Numa'),l=props.filter(p=>DLY_BRAND[p]==='LSA');
+  if(n.length&&l.length){
+    return(n.length?'<tr class="gh"><td colspan="20">Numa · Anjos & Rato</td></tr>'+n.map(fn).join(''):'')
+          +(l.length?'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 18 properties</td></tr>'+l.map(fn).join(''):'');
+  }
+  if(showAgg&&n.length){return'<tr class="gh"><td colspan="20">Numa · Anjos & Rato</td></tr>'+n.map(fn).join('');}
+  if(showAgg&&l.length){return'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 18 properties</td></tr>'+l.map(fn).join('');}
+  return props.map(fn).join('');
+}
+function weekOverall(p){const w=WEEK_DATA[p]||{};let t=0,d=0;WEEKDAYS.forEach(wd=>{const c=w[wd];if(c){t+=c.t;d+=c.d;}});return t?Math.round(d/t*100):null;}
+function roll4Overall(p){const r=ROLL4_DATA[p]||{};const v=Object.values(r);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;}
+function latestOTA(p,m){const mo=OTA_MONTHS.slice().reverse().find(x=>(OTA_DATA[p]||{})[x]&&(OTA_DATA[p]||{})[x][m]);return mo?(OTA_DATA[p][mo][m]):null;}
+function avg(arr){const f=arr.filter(x=>x!==null&&x!==undefined);return f.length?Math.round(f.reduce((a,b)=>a+b,0)/f.length*10)/10:null;}
+
+// ── Mode toggle
+function switchMode(mode,btn){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.querySelectorAll('.mode-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('mode-'+mode).classList.add('active');
+}
+
+// ── SUMMARY ──────────────────────────────────────────────────────────
+const numaProps = DLY_PROPS.filter(p=>DLY_BRAND[p]==='Numa');
+const lsaProps  = DLY_PROPS.filter(p=>DLY_BRAND[p]==='LSA');
+
+function brandMetrics(props){
+  const delays=props.map(p=>weekOverall(p)).filter(x=>x!==null);
+  const r4s=props.map(p=>roll4Overall(p)).filter(x=>x!==null);
+  const otas=props.filter(p=>OTA_DATA[p]).map(p=>latestOTA(p,'overall')).filter(Boolean);
+  const cleans=props.filter(p=>OTA_DATA[p]).map(p=>latestOTA(p,'cleanliness')).filter(Boolean);
+  const belowEight=otas.filter(x=>x<8).length;
+  const highDelay=delays.filter(x=>x>=30).length;
+  let totalCbT=0,totalCbC=0;
+  props.forEach(p=>{const s=p.replace(' by Numa','').replace('Lisbon ','');Object.values(INSP_DATA[p]||{}).forEach(m=>{totalCbT+=m.to_inspection||0;});totalCbC+=INSP_CALLBACKS.filter(cb=>cb.property===s).length;});
+  return{avgOTA:avg(otas),avgClean:avg(cleans),avgDelay:delays.length?Math.round(delays.reduce((a,b)=>a+b,0)/delays.length):null,belowEight,highDelay,cbRate:totalCbT?Math.round(totalCbC/totalCbT*100):null,props:props.length};
+}
+
+(function buildSummary(){
+  const nm=brandMetrics(numaProps),ls=brandMetrics(lsaProps);
+  const allDelays=DLY_PROPS.map(p=>weekOverall(p)).filter(x=>x!==null);
+  const allOTAs=OTA_PROPS.map(p=>latestOTA(p,'overall')).filter(Boolean);
+  const highDelay=DLY_PROPS.filter(p=>weekOverall(p)>=30);
+  const belowEight=OTA_PROPS.filter(p=>latestOTA(p,'overall')&&latestOTA(p,'overall')<8);
+  const cbCleaners=CLEANERS.filter(c=>c.callback_rate>0&&c.inspections>=3).sort((a,b)=>b.callback_rate-a.callback_rate);
+  const allFails={};Q_FAILS.forEach(item=>{allFails[item.question]=(allFails[item.question]||0)+item.total;});
+  const topFail=Object.entries(allFails).sort((a,b)=>b[1]-a[1])[0];
+
+  // Alerts
+  const worst=highDelay.sort((a,b)=>weekOverall(b)-weekOverall(a));
+  const alerts=[
+    highDelay.length>0?{cls:'alert-danger',lbl:'🚨 Delay — systemic',body:`<strong>${highDelay.length} of ${DLY_PROPS.length} properties</strong> above 30% delay last week. Worst: <strong>${(worst[0]||'').replace(' by Numa','')} at ${weekOverall(worst[0]||'')}%</strong>.`}:null,
+    belowEight.length>0?{cls:'alert-danger',lbl:'🚨 OTA below 8.0',body:`<strong>${belowEight.length} LSA properties</strong> below Booking.com visibility threshold. Worst: <strong>${belowEight.sort((a,b)=>latestOTA(a,'overall')-latestOTA(b,'overall'))[0].replace(' by Numa','')} at ${latestOTA(belowEight[0],'overall')}</strong>.`}:null,
+    cbCleaners.length?{cls:'alert-warn',lbl:'⚠ Callback rate',body:`<strong>${cbCleaners[0].name}</strong> — ${cbCleaners[0].callback_rate}% callback rate (${cbCleaners[0].inspections} inspections). Highest in team.`}:null,
+    {cls:'alert-ok',lbl:'✅ Numa benchmark',body:`Anjos &amp; Rato both at <strong>8.9+ B.com overall</strong> — strong benchmark for the LSA portfolio.`},
+  ].filter(Boolean);
+  document.getElementById('alert-strip').innerHTML=alerts.map(a=>`<div class="alert ${a.cls}"><div class="al">${a.lbl}</div><div class="ab">${a.body}</div></div>`).join('');
+
+  // Brand panels
+  function kpi(lbl,val,cls,sub){return`<div><div class="bp-kpi-lbl">${lbl}</div><div class="bp-kpi-val ${cls||''}">${val??'—'}</div><div class="bp-kpi-sub">${sub||''}</div></div>`;}
+  document.getElementById('bp-numa').innerHTML=[
+    kpi('B.com overall',nm.avgOTA,nm.avgOTA>=9?'green':'amber','2 properties'),
+    kpi('B.com clean',nm.avgClean,nm.avgClean>=9?'green':'amber','avg latest month'),
+    kpi('Avg delay',nm.avgDelay!==null?nm.avgDelay+'%':null,nm.avgDelay>=30?'red':nm.avgDelay>=10?'amber':'green','last week'),
+    kpi('Delay ≥ 30%',nm.highDelay,nm.highDelay>0?'amber':'green','properties'),
+    kpi('Callback rate',nm.cbRate!==null?nm.cbRate+'%':null,nm.cbRate>=30?'red':nm.cbRate>=15?'amber':'green','Apr–Jun 2026'),
+    kpi('Inspection cov.','~6%','amber','of cleanings'),
+  ].join('');
+  document.getElementById('bp-lsa').innerHTML=[
+    kpi('B.com overall',ls.avgOTA,ls.avgOTA>=8.5?'green':ls.avgOTA>=8?'amber':'red','18 properties avg'),
+    kpi('Below 8.0',ls.belowEight,ls.belowEight>5?'red':ls.belowEight>0?'amber':'green','properties'),
+    kpi('Avg delay',ls.avgDelay!==null?ls.avgDelay+'%':null,ls.avgDelay>=30?'red':ls.avgDelay>=10?'amber':'green','last week'),
+    kpi('Delay ≥ 30%',ls.highDelay,ls.highDelay>8?'red':ls.highDelay>3?'amber':'green','properties'),
+    kpi('Cleaner data','—','',' '),
+    kpi('Callbacks','—','','no checklist yet'),
+  ].join('');
+
+  // Findings
+  const findings=[
+    highDelay.length>0?{icon:'🔴',text:`<strong>Delay is systemic — across both Numa and LSA.</strong> ${highDelay.length} of ${DLY_PROPS.length} properties finished over 30% of rooms after 15:00 last week. LSA is the most severe — top offenders: ${worst.slice(0,3).map(p=>p.replace(' by Numa','')+' '+weekOverall(p)+'%').join(', ')}.`}:null,
+    {icon:'📊',text:`<strong>Numa and LSA are two different realities.</strong> Numa averages ${nm.avgOTA} B.com overall vs LSA at ${ls.avgOTA}. Cleanliness scores are consistently lower than overall scores across the LSA portfolio — guests notice cleaning specifically.`},
+    cbCleaners.length?{icon:'👤',text:`<strong>${cbCleaners[0].name} at ${cbCleaners[0].property.replace('Lisbon ','')} needs attention.</strong> ${cbCleaners[0].callback_rate}% callback rate across ${cbCleaners[0].inspections} inspections — highest in the team.`}:null,
+    {icon:'📋',text:`<strong>Checklist callbacks: ${INSP_CALLBACKS.length} total (Apr–Jun 2026).</strong> All from Anjos & Rato. LSA properties have no inspection checklist data yet.`},
+    {icon:'⚠️',text:`<strong>Inspection coverage is too low for firm cleaner-level conclusions.</strong> ~6% at Anjos, ~3% at Rato. No inspection data yet for any of the 18 LSA properties.`},
+  ].filter(Boolean);
+  document.getElementById('findings-list').innerHTML=findings.map(f=>`<div class="finding"><div class="fi">${f.icon}</div><div class="ft">${f.text}</div></div>`).join('');
+
+  // Actions
+  const actions=[
+    highDelay.length>0?{cls:'ac',n:1,text:`<strong>Investigate delay root cause across all of Lisbon.</strong> ${highDelay.length} of ${DLY_PROPS.length} properties above 30% delay. Are LSA cleaning slots too tight? Wrong 15:00 threshold for this market?`}:null,
+    cbCleaners.length?{cls:'ac',n:2,text:`<strong>Review ${cbCleaners[0].name} at ${cbCleaners[0].property.replace('Lisbon ','')}.</strong> ${cbCleaners[0].callback_rate}% callback rate vs 0% for peers. Supervised shift + focused re-training.`}:null,
+    {cls:'aw',n:3,text:`<strong>Start inspection checklist for LSA properties.</strong> No callback data exists for 18 LSA properties. Extend the Google Form or set up equivalent.`},
+    {cls:'aw',n:4,text:`<strong>Increase inspection frequency to 10%+.</strong> Currently ~6% at Anjos, ~3% at Rato. Double the coordinator rounds before drawing cleaner-level conclusions.`},
+  ].filter(Boolean);
+  document.getElementById('actions-list').innerHTML=actions.map(a=>`<div class="action ${a.cls}"><div class="an">${a.n}</div><div class="abody">${a.text}</div></div>`).join('');
+
+  // Scorecard
+  buildScorecard('all');
+})();
+
+let scBrand='all';
+function filterSc(brand,btn){
+  scBrand=brand;
+  document.querySelectorAll('#sc-all,#sc-numa,#sc-lsa').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildScorecard(brand);
+}
+// ── GLASS HELPERS ─────────────────────────────────────────────────────
+function glassTopTheme(p){
+  const themes=GLASS_THEMES[p];
+  if(!themes||!themes.length)return null;
+  return themes[0];
+}
+function glassSentCell(p){
+  const t=glassTopTheme(p);
+  if(!t)return`<td style="text-align:center;color:#bbb;font-size:11px">—</td>`;
+  const ns=t.net_sentiment;
+  const nsCol=ns>=0?'#166534':'#991b1b';
+  const nsBg=ns>=0?'#f0fdf4':'#fee2e2';
+  const abbr=t.category.replace('Housekeeping Issues / Requests','HSK Issues').replace('Bedroom & Main Room','Bedroom').replace('Temperature / Climate Control','Temp/AC').replace('Maintenance Issues','Maintenance').replace('Room Overall','Room Overall');
+  return`<td style="text-align:center"><span style="font-size:10px;color:#555">${abbr}</span><br><span style="display:inline-block;margin-top:2px;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:700;background:${nsBg};color:${nsCol}">NS ${ns>0?'+':''}${ns}</span></td>`;
+}
+
+function buildScorecard(brand){
+  const props=fp(brand);
+  document.getElementById('scorecard-body').innerHTML=gr(props,p=>{
+    const pd=PORTFOLIO[p]||{},dw=weekOverall(p),r4=roll4Overall(p);
+    const ps=p.replace(' by Numa','').replace('Lisbon ','');
+    const cbT=Object.values(INSP_DATA[p]||{}).reduce((s,m)=>s+(m.to_inspection||0),0);
+    const cbC=INSP_CALLBACKS.filter(cb=>cb.property===ps).length;
+    const cbR=cbT?Math.round(cbC/cbT*100):null;
+    return`<tr>
+      <td>${badge(p)}</td>
+      <td style="font-weight:600">${p.replace(' by Numa','')}</td>
+      <td style="text-align:center"><span class="ota ${oc(pd.ota_overall)}">${pd.ota_overall??'—'}</span></td>
+      <td style="text-align:center"><span class="ota ${oc(pd.ota_clean)}">${pd.ota_clean??'—'}</span></td>
+      <td style="text-align:center">${dw!==null?`<span class="pct ${dc(dw)}">${dw}%</span>`:'—'}</td>
+      <td style="text-align:center">${r4!==null?`<span class="pct ${dc(r4)}">${r4}%</span>`:'—'}</td>
+      <td style="text-align:center">${cbR!==null?`<span class="pct ${cbR>=40?'c-red':cbR>=20?'c-amber':'c-green'}">${cbR}%</span>`:'—'}</td>
+      ${glassSentCell(p)}
+    </tr>`;
+  },true);
+}
+
+// ── OPERATIONAL TABS ─────────────────────────────────────────────────
+let pfB='all';function fpf(b,btn){pfB=b;sf(btn);bldPf();}
+function bldPf(){
+  const props=fp(pfB).filter(p=>p in PORTFOLIO);
+  document.getElementById('pf-body').innerHTML=gr(props,p=>{
+    const d=PORTFOLIO[p]||{},cov=d.coverage,cb=d.cb_rate;
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td><td style="text-align:center"><span class="ota ${oc(d.ota_overall)}">${d.ota_overall??'—'}</span></td><td style="text-align:center"><span class="ota ${oc(d.ota_clean)}">${d.ota_clean??'—'}</span></td><td style="text-align:center">${d.cleanings_90d||0}</td><td style="text-align:center">${cov!=null?`<span class="pct ${cov<5?'c-red':cov<10?'c-amber':'c-green'}">${cov}%</span>`:'—'}</td><td style="text-align:center">${cb!=null?`<span class="pct ${cb>=40?'c-red':cb>=20?'c-amber':'c-green'}">${cb}%<br><span style="font-size:9px;font-weight:400">${d.cb_count}/${d.cb_total}</span></span>`:'—'}</td>${glassSentCell(p)}</tr>`;
+  });
+}bldPf();
+
+let clP='all';function fcl(p,btn){clP=p;sf(btn);bldCl();}
+let _lastCleanerData=null;
+function bldCl(){
+  let data=CLEANERS.filter(c=>c.cleanings>0||c.inspections>0);
+  if(clP!=='all')data=data.filter(c=>c.property===clP);
+  const tbody=document.getElementById('cl-body');
+  if(!data.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:#aaa">No data</td></tr>';return;}
+  _lastCleanerData=data;tbody.innerHTML=data.map((c,_ci)=>{const s=c.clean_score,bw=s?Math.round((s/10)*70):0,ln=c.n_reviews<5&&c.n_reviews>0?`<span class="low-n">⚠${c.n_reviews}</span>`:'',cb=c.callback_rate!=null,fails=c.top_fails&&c.top_fails.length?c.top_fails.slice(0,2).join(', '):'';return`<tr style='cursor:pointer' onclick='showCleanerDetail(${_ci})'><td><strong>${c.name}</strong></td><td>${c.property}</td><td style="text-align:center">${c.cleanings||'—'}</td><td style="text-align:left;padding-left:12px">${s?`<span class="ota ${oc(s)}" style="font-weight:700">${s.toFixed(2)}</span><span class="bar" style="width:${bw}px;background:${bc(s)}"></span>${ln}`:`<span style="color:#aaa;font-size:11px">—</span>`}</td><td style="text-align:center">${c.inspections||'—'}</td><td style="text-align:center">${cb?`<span class="pct ${c.callback_rate>=40?'c-red':c.callback_rate>=20?'c-amber':'c-green'}">${c.callback_rate}%</span>`:'—'}</td><td style="color:#888;font-size:11px">${fails||'—'}</td></tr>`;}).join('');
+}bldCl();
+
+let rtB='all';function frt(b,btn){rtB=b;sf(btn);bldRat();}
+function bldRat(){
+  const met=document.getElementById('rat-metric').value,props=OTA_PROPS.filter(p=>rtB==='all'||DLY_BRAND[p]===rtB);
+  document.getElementById('rat-head').innerHTML=`<tr><th style="width:28px"></th><th>Property</th>${OTA_MONTHS.map(m=>`<th class="mhdr">${m.slice(5)}<br><span style="font-size:9px;color:#aaa">${m.slice(0,4)}</span></th>`).join('')}<th class="mhdr">Latest</th></tr>`;
+  document.getElementById('rat-body').innerHTML=gr(props,p=>{
+    const cells=OTA_MONTHS.map(m=>{const r=(OTA_DATA[p]||{})[m],v=r?r[met]:null;return`<td style="text-align:center"><span class="ota ${oc(v)}">${v!=null?v.toFixed(1):'—'}</span></td>`;}).join('');
+    let lat=null;for(let i=OTA_MONTHS.length-1;i>=0;i--){const r=(OTA_DATA[p]||{})[OTA_MONTHS[i]];if(r&&r[met]){lat=r[met];break;}}
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td>${cells}<td style="text-align:center"><span class="ota ${oc(lat)}" style="font-size:13px;font-weight:700">${lat?lat.toFixed(1):'—'}</span></td></tr>`;
+  });
+}bldRat();
+
+let ipB='all';function fip(b,btn){ipB=b;sf(btn);bldIp();}
+function bldIp(){
+  const months=INSP_MONTHS,props=fp(ipB);
+  document.getElementById('ip-head').innerHTML=`<tr><th style="width:28px"></th><th>Property</th>${months.map(m=>`<th class="mhdr">${m.slice(5)}<br><span style="font-size:9px;color:#aaa">${m.slice(0,4)}</span></th>`).join('')}</tr>`;
+  document.getElementById('ip-body').innerHTML=gr(props,p=>{
+    const ps=p.replace(' by Numa','').replace('Lisbon ',''),cbData=INSP_CALLBACKS[ps]||{};
+    const cells=months.map(m=>{const r=(INSP_DATA[p]||{})[m],insp=r?r.inspected:null,cb=cbData[m];const cbStr=cb?`<span class="pct ${cb.rate>=40?'c-red':cb.rate>=20?'c-amber':'c-green'}" style="font-size:9px;padding:1px 4px">${cb.callbacks}cb ${cb.rate}%</span>`:'';return`<td style="text-align:center">${insp!=null?`<div style="font-weight:600">${insp.toLocaleString()}</div>${cbStr}`:'<span style="color:#ccc">—</span>'}</td>`;}).join('');
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td>${cells}</tr>`;
+  });
+}bldIp();
+
+let cbF='all';function fcb(p,btn){cbF=p;sf(btn);bldCb();}
+function bldCb(){
+  let rows=[];
+  const col=cbF==='all'?'total':cbF.toLowerCase();
+  const maxN=Math.max(...Q_FAILS.map(item=>item[col]||0),1);
+  Q_FAILS.forEach(item=>{
+    const n=item[col]||0;
+    if(n>0){const prop=cbF==='Anjos'?'Lisbon Anjos':cbF==='Rato'?'Lisbon Rato':'Anjos & Rato';rows.push({prop,q:item.question,n});}
+  });
+  rows.sort((a,b)=>b.n-a.n);
+  document.getElementById('cb-body').innerHTML=rows.length?rows.map(r=>`<tr><td>${r.prop}</td><td>${r.q}</td><td style="text-align:center"><strong style="color:#991b1b">${r.n}×</strong></td><td><div style="background:#fee2e2;width:${Math.round(r.n/maxN*120)}px;height:8px;border-radius:3px"></div></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:20px;color:#aaa">No data</td></tr>';
+}bldCb();
+
+let dlB='all';function fdl(b,btn){dlB=b;sf(btn);bldDl();}
+function bldDl(){
+  const props=fp(dlB);
+  document.getElementById('dl-body').innerHTML=gr(props,p=>{
+    const w=WEEK_DATA[p]||{},r4=ROLL4_DATA[p]||{};let tt=0,td=0;WEEKDAYS.forEach(d=>{const c=w[d];if(c){tt+=c.t;td+=c.d;}});
+    const ov=tt?Math.round(td/tt*100):null;
+    const days=WEEKDAYS.map(d=>{const c=w[d],r=r4[d];if(!c)return`<td style="text-align:center"><span class="pct c-grey" style="font-size:10px">—</span></td>`;return`<td style="text-align:center"><span class="pct ${dc(c.pct)}">${c.pct}%<br><span class="sub-pct">(${r!==undefined?r+'%':'—'})</span></span></td>`;}).join('');
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td>${days}<td style="text-align:center"><span class="pct ${dc(ov)}" style="font-weight:700">${ov!=null?ov+'%':'—'}</span></td></tr>`;
+  });
+}bldDl();
+
+let mthB='all';function fmth(b,btn){mthB=b;sf(btn);bldMth();}
+function bldMth(){
+  const props=fp(mthB);
+  document.getElementById('mth-head').innerHTML=`<tr><th style="width:28px"></th><th>Property</th>${DLY_MONTHS.map(m=>`<th class="mhdr">${m.slice(5)}<br><span style="font-size:9px;color:#aaa">${m.slice(0,4)}</span>${m===CURRENT_MONTH?'<span class="partial">partial</span>':''}</th>`).join('')}</tr>`;
+  document.getElementById('mth-body').innerHTML=gr(props,p=>{
+    const md=MTHLY_DATA[p]||{};
+    const cells=DLY_MONTHS.map(m=>{const v=md[m];return`<td style="text-align:center"><span class="pct ${v==null?'c-grey':dc(v)}">${v!=null?v+'%':'—'}</span></td>`;}).join('');
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td>${cells}</tr>`;
+  });
+}bldMth();
+
+// ── GUEST THEMES TAB ──────────────────────────────────────────────────
+let gtB='all';function fgt(b,btn){gtB=b;sf(btn);bldGt();}
+function bldGt(){
+  const props=fp(gtB);
+  const allMax=Math.max(...props.flatMap(p=>(GLASS_THEMES[p]||[]).map(t=>t.negative_count)),1);
+  let html='';
+  props.forEach(p=>{
+    const themes=GLASS_THEMES[p];
+    if(!themes||!themes.length)return;
+    const isLSA=DLY_BRAND[p]==='LSA';
+    html+=`<tr class="${isLSA?'gh-lsa':'gh'}"><td colspan="5">${badge(p)} ${p.replace(' by Numa','')}</td></tr>`;
+    themes.forEach(t=>{
+      const barW=Math.round((t.negative_count/allMax)*100);
+      const ns=t.net_sentiment;
+      const nsCol=ns>=0?'#166534':'#991b1b';
+      const nsBg=ns>=0?'#f0fdf4':'#fee2e2';
+      const barCol=ns>=0?'#22c55e':'#ef4444';
+      html+=`<tr>
+        <td></td>
+        <td style="font-size:12px;padding-left:20px">${t.category}</td>
+        <td style="text-align:center;font-size:12px;font-weight:600">${t.negative_count}</td>
+        <td style="padding:0 10px"><div style="height:6px;background:#e5e5e5;border-radius:3px;overflow:hidden"><div style="width:${barW}%;height:100%;background:${barCol};border-radius:3px"></div></div></td>
+        <td style="text-align:center"><span style="padding:2px 7px;border-radius:3px;font-size:11px;font-weight:700;background:${nsBg};color:${nsCol}">NS ${ns>0?'+':''}${ns}</span></td>
+      </tr>`;
+    });
+  });
+  document.getElementById('gt-body').innerHTML=html||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa">No guest theme data available this refresh</td></tr>';
+}bldGt();
+
+document.querySelectorAll('#mode-operational .tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('#mode-operational .tab,#mode-operational .content').forEach(e=>e.classList.remove('active'));
+  t.classList.add('active');document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+}));
+
+// ── UNITS NPS ────────────────────────────────────────────────────────
+let uProp='all', uShow='all';
+(function(){
+  const f=document.getElementById('unit-prop-filters');
+  const b0=document.createElement('button');
+  b0.className='filter-btn active';b0.textContent='All';
+  b0.onclick=function(){uProp='all';f.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));this.classList.add('active');buildUnits();};
+  f.appendChild(b0);
+  Object.keys(UNIT_NPS).sort().forEach(p=>{
+    const b=document.createElement('button');
+    b.className='filter-btn';
+    b.textContent=p.replace(' by Numa','').replace('Lisbon ','');
+    b.onclick=function(){uProp=p;f.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));this.classList.add('active');buildUnits();};
+    f.appendChild(b);
+  });
+})();
+function setUS(mode,btn){uShow=mode;document.querySelectorAll('#us-all,#us-bad,#us-neg').forEach(b=>b.classList.remove('active'));btn.classList.add('active');buildUnits();}
+function npsStyle(v){
+  if(v<0)  return'background:#7f1d1d;color:#fff;';
+  if(v<40) return'background:#fee2e2;color:#991b1b;';
+  if(v<60) return'background:#fef3c7;color:#92400e;';
+  return'background:#f0fdf4;color:#166534;';
+}
+function buildUnits(){
+  const props=uProp==='all'?Object.keys(UNIT_NPS).sort():[uProp];
+  let rows=[];
+  props.forEach(p=>{
+    const pd=UNIT_NPS[p]||{};
+    const pNPS=pd.prop_nps;
+    (pd.units||[]).forEach(u=>{
+      if(uShow==='bad'&&u.nps>=40)return;
+      if(uShow==='neg'&&u.nps>=0)return;
+      rows.push({prop:p,unit:u.unit,nps:u.nps,n:u.n,pNPS});
+    });
+  });
+  rows.sort((a,b)=>a.nps-b.nps);
+  const tbody=document.getElementById('unit-body');
+  if(!rows.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa">No units matching filter</td></tr>';return;}
+  let lastProp=null;
+  tbody.innerHTML=rows.map(r=>{
+    let hdr='';
+    if(r.prop!==lastProp){
+      lastProp=r.prop;
+      const cls=r.prop.startsWith('LSA')?'gh-lsa':'gh';
+      const below=((UNIT_NPS[r.prop]||{}).units||[]).filter(u=>u.nps<40).length;
+      const total=((UNIT_NPS[r.prop]||{}).units||[]).length;
+      const pStr=r.pNPS!==null?` · avg ${r.pNPS}`:'';
+      const warnStr=below>0?` · <span style="color:#991b1b;font-weight:700">${below}/${total} below 40</span>`:'';
+      hdr=`<tr class="${cls}"><td colspan="6">${r.prop.replace(' by Numa','')}${pStr}${warnStr}</td></tr>`;
+    }
+    const delta=r.pNPS!==null?Math.round(r.nps-r.pNPS):null;
+    const dStr=delta!==null?`<span style="font-weight:600;color:${delta>=0?'#166534':'#991b1b'}">${delta>=0?'+':''}${delta}</span>`:'—';
+    return hdr+`<tr>
+      <td>${badge(r.prop)}</td>
+      <td style="color:#666;font-size:11px">${r.prop.replace(' by Numa','').replace('Lisbon ','')}</td>
+      <td style="text-align:center;font-weight:600">${r.unit}</td>
+      <td style="text-align:center"><span style="display:inline-block;padding:3px 8px;border-radius:4px;font-weight:700;font-size:12px;${npsStyle(r.nps)};min-width:44px;text-align:center">${r.nps}</span></td>
+      <td style="text-align:center">${dStr}</td>
+      <td style="text-align:center;color:#888">${r.n}</td>
+    </tr>`;
+  }).join('');
+}
+buildUnits();
+
+
+// ── CLEANER DETAIL PANEL ──────────────────────────────────────────────
+function showCleanerDetail(idx) {
+  const c = (_lastCleanerData||CLEANERS)[idx];
+  if (!c) return;
+  const prop = c.property || '';
+  const pa = PROP_AVGS[prop] || {};
+
+  document.getElementById('cd-name').textContent = c.name;
+  document.getElementById('cd-prop').textContent = prop.replace(' by Numa','').replace('Lisbon ','') + ' · ' + (c.role || 'cleaner');
+  document.getElementById('cleaner-detail').style.display = 'block';
+  document.getElementById('cleaner-detail').scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  // KPI strip
+  function kpi(label, val, sub, color) {
+    return `<div style="background:#f8f8f6;border-radius:6px;padding:10px 12px;border:.5px solid #e5e5e5">
+      <div style="font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${label}</div>
+      <div style="font-size:18px;font-weight:700;color:${color||'#1a1a1a'}">${val}</div>
+      ${sub?`<div style="font-size:10px;color:#9ca3af;margin-top:1px">${sub}</div>`:''}
+    </div>`;
+  }
+
+  const cleanColor = c.clean_score ? (c.clean_score>=9?'#166534':c.clean_score>=8?'#92400e':'#991b1b') : '#aaa';
+  const npsColor   = c.checkout_nps!=null ? (c.checkout_nps>=70?'#166534':c.checkout_nps>=50?'#92400e':'#991b1b') : '#aaa';
+  const cbColor    = c.callback_rate!=null ? (c.callback_rate>=40?'#991b1b':c.callback_rate>=20?'#92400e':'#166534') : '#aaa';
+
+  document.getElementById('cd-kpis').innerHTML =
+    kpi('Cleanings (90d)', c.cleanings||'—', 'via SHINE', '#1a1a1a') +
+    kpi('OTA Cleanliness', c.clean_score?c.clean_score.toFixed(2):'—', c.n_reviews?'n='+c.n_reviews+' reviews':'no data', cleanColor) +
+    kpi('Checkout NPS', c.checkout_nps!=null?c.checkout_nps:'—', c.nps_n?'n='+c.nps_n+' stays':'no data', npsColor) +
+    kpi('Inspections', c.inspections||'—', 'checked by coordinator', '#1a1a1a') +
+    kpi('Callback rate', c.callback_rate!=null?c.callback_rate+'%':'—', c.inspections?'of '+c.inspections+' inspections':'no data', cbColor);
+
+  // NPS breakdown bar
+  const p = c.nps_promoters, det = c.nps_detractors, n = c.nps_n||0;
+  const passives = n - (p||0) - (det||0);
+  if (n > 0) {
+    const pPct = Math.round((p||0)/n*100), dPct = Math.round((det||0)/n*100), nPct = 100-pPct-dPct;
+    document.getElementById('cd-nps-bar').innerHTML = `
+      <div style="display:flex;height:24px;border-radius:4px;overflow:hidden;margin-bottom:8px">
+        <div style="width:${pPct}%;background:#16a34a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">${pPct>8?pPct+'%':''}</div>
+        <div style="width:${nPct}%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:10px;font-weight:700">${nPct>8?nPct+'%':''}</div>
+        <div style="width:${dPct}%;background:#dc2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">${dPct>8?dPct+'%':''}</div>
+      </div>
+      <div style="display:flex;gap:12px;font-size:11px;color:#555">
+        <span><span style="color:#16a34a;font-weight:700">${p||0}</span> promoters (9–10)</span>
+        <span><span style="color:#6b7280;font-weight:700">${passives}</span> passives (7–8)</span>
+        <span><span style="color:#dc2626;font-weight:700">${det||0}</span> detractors (0–6)</span>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#aaa">${n} matched stays · avg rating ${c.nps_avg_rating?c.nps_avg_rating.toFixed(1):'—'}/10</div>`;
+  } else {
+    document.getElementById('cd-nps-bar').innerHTML = '<div style="color:#aaa;font-size:12px">No checkout feedback matched</div>';
+  }
+
+  // vs property average
+  const vsLines = [];
+  if (pa.avg_rating && c.clean_score) {
+    const diff = (c.clean_score - pa.avg_rating).toFixed(2);
+    const col = diff>=0?'#16a34a':'#dc2626';
+    vsLines.push(`OTA Cleanliness: <b style="color:${col}">${diff>=0?'+':''}${diff}</b> vs property avg ${pa.avg_rating}`);
+  }
+  if (pa.avg_nps!=null && c.checkout_nps!=null) {
+    const diff = c.checkout_nps - pa.avg_nps;
+    const col = diff>=0?'#16a34a':'#dc2626';
+    vsLines.push(`Checkout NPS: <b style="color:${col}">${diff>=0?'+':''}${diff}</b> vs property avg ${pa.avg_nps}`);
+  }
+  document.getElementById('cd-vs-avg').innerHTML = vsLines.length
+    ? vsLines.map(l=>`<div style="font-size:12px;margin-bottom:5px">• ${l}</div>`).join('')
+    : '<div style="color:#aaa;font-size:12px">No comparison data</div>';
+
+  // AI summary
+  const summaryEl = document.getElementById('cd-summary-text');
+  summaryEl.textContent = 'Generating analysis…';
+  summaryEl.style.fontStyle = 'italic';
+  summaryEl.style.color = '#9ca3af';
+
+  const summaryData = {
+    name: c.name,
+    property: prop.replace(' by Numa','').replace('Lisbon ',''),
+    cleanings_90d: c.cleanings || 0,
+    ota_cleanliness: c.clean_score ? c.clean_score.toFixed(2) : null,
+    ota_n_reviews: c.n_reviews || 0,
+    checkout_nps: c.checkout_nps !== undefined ? c.checkout_nps : null,
+    nps_n_stays: c.nps_n || 0,
+    nps_promoters: c.nps_promoters || 0,
+    nps_detractors: c.nps_detractors || 0,
+    inspections: c.inspections || 0,
+    callback_rate: c.callback_rate !== null ? c.callback_rate : null,
+    top_fails: c.top_fails || [],
+    prop_avg_ota: pa.avg_rating || null,
+    prop_avg_nps: pa.avg_nps || null,
+    prop_avg_cb: null,
+  };
+
+  const prompt = `You are an operations analyst for Numa, a hospitality company in Lisbon.
+Write a concise 3–4 sentence cleaner assessment based on the data below. Be specific and honest.
+Structure: (1) overall verdict — strong/average/concern, (2) which metric stands out most and why,
+(3) concrete recommended action (peer mentor / monitor / coach / re-train / no action).
+Keep it under 80 words. No bullet points, no headers — flowing prose only.`;
+
+  function _applyTxt(r) {
+    let t = typeof r === 'string' ? r : null;
+    if (!t && r) {
+      if (Array.isArray(r.content)) t = r.content.map(b=>b.text||'').join('');
+      else if (r.text) t = r.text;
+      else if (r.completion) t = r.completion;
+      else { const v=Object.values(r); if(v.length===1&&typeof v[0]==='string') t=v[0]; }
+    }
+    summaryEl.textContent = t || buildFallbackSummary(summaryData, pa);
+    summaryEl.style.fontStyle = 'normal';
+    summaryEl.style.color = '#374151';
+  }
+  if (window.cowork && window.cowork.askClaude) {
+    (async () => {
+      try { _applyTxt(await window.cowork.askClaude(prompt, [summaryData])); }
+      catch(e) { _applyTxt(buildFallbackSummary(summaryData, pa)); }
+    })();
+  } else {
+    _applyTxt(buildFallbackSummary(summaryData, pa));
+  }
+
+  // Top fails
+  const fails = c.top_fails||[];
+  document.getElementById('cd-fails').innerHTML = fails.length
+    ? fails.map(f=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:8px;height:8px;background:#fee2e2;border-radius:50%;flex-shrink:0"></div><div style="font-size:12px;color:#374151">${f}</div></div>`).join('') +
+      (c.callback_rate>0?`<div style="margin-top:6px;font-size:11px;color:#991b1b;font-weight:600">${c.callbacks} of ${c.inspections} inspections needed a callback</div>`:'')
+    : '<div style="color:#aaa;font-size:12px">No inspection data</div>';
+}
+
+
+function buildFallbackSummary(d, pa) {
+  const signals = [];
+  let verdict = 'average';
+  let redFlags = 0, greenFlags = 0;
+
+  if (d.ota_cleanliness && d.ota_n_reviews >= 5) {
+    const diff = d.ota_cleanliness - (pa.avg_rating || d.ota_cleanliness);
+    if (d.ota_cleanliness >= 9.3) { signals.push(`strong OTA cleanliness (${d.ota_cleanliness})`); greenFlags++; }
+    else if (d.ota_cleanliness < 8.5) { signals.push(`low OTA cleanliness (${d.ota_cleanliness}, ${diff.toFixed(2)} below team avg)`); redFlags++; }
+  }
+  if (d.checkout_nps !== null && d.nps_n_stays >= 5) {
+    const diff = d.checkout_nps - (pa.avg_nps || d.checkout_nps);
+    if (d.checkout_nps >= 70) { signals.push(`high checkout NPS (${d.checkout_nps})`); greenFlags++; }
+    else if (d.checkout_nps < 50) { signals.push(`low checkout NPS (${d.checkout_nps}, ${Math.round(diff)} vs team avg)`); redFlags++; }
+  }
+  if (d.callback_rate !== null && d.inspections >= 3) {
+    if (d.callback_rate >= 40) { signals.push(`high callback rate (${d.callback_rate}%)`); redFlags++; }
+    else if (d.callback_rate === 0) { signals.push(`0% callback rate`); greenFlags++; }
+  }
+
+  if (redFlags >= 2) verdict = 'concern';
+  else if (greenFlags >= 2) verdict = 'strong';
+
+  const action = verdict === 'concern'
+    ? `Recommend a supervised shift and focused re-training${d.top_fails.length ? ' on ' + d.top_fails[0] : ''}.`
+    : verdict === 'strong'
+    ? 'Strong candidate to use as a peer benchmark for the team.'
+    : 'Continue monitoring with regular inspections.';
+
+  const signalStr = signals.length
+    ? `Key signals: ${signals.join('; ')}.`
+    : 'Insufficient data for a full assessment.';
+
+  return `${d.name} (${d.property}) — ${verdict === 'concern' ? 'needs attention' : verdict === 'strong' ? 'top performer' : 'performing at average'}. ${signalStr} ${action}`;
+}
+
+
+// ── REFRESH BUTTON ────────────────────────────────────────────────────
+function triggerRefresh() {
+  const btn   = document.getElementById('refresh-btn');
+  const icon  = document.getElementById('refresh-icon');
+  const label = document.getElementById('refresh-label');
+
+  if (!window.cowork || !window.cowork.runScheduledTask) {
+    label.textContent = 'Open in Cowork to refresh';
+    setTimeout(() => { label.textContent = 'Refresh data'; }, 3000);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+  icon.style.display = 'inline-block';
+  icon.style.animation = 'spin 1s linear infinite';
+  label.textContent = 'Refreshing…';
+
+  if (!document.getElementById('spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'spin-style';
+    s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+
+  window.cowork.runScheduledTask('cleaning-quality-dashboard-monday-refresh')
+    .then(() => {
+      icon.style.animation = '';
+      icon.textContent = '✓';
+      label.textContent = 'Refresh started — updating in ~2 min';
+      btn.style.background = '#f0fdf4';
+      btn.style.borderColor = '#86efac';
+      btn.style.color = '#166534';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.background = '#f3f4f6';
+        btn.style.borderColor = '#e5e5e5';
+        btn.style.color = '#555';
+        icon.textContent = '↻';
+        label.textContent = 'Refresh data';
+      }, 8000);
+    })
+    .catch(() => {
+      icon.style.animation = '';
+      icon.textContent = '↻';
+      label.textContent = 'Refresh failed — try again';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      setTimeout(() => { label.textContent = 'Refresh data'; }, 3000);
+    });
+}
+
+</script>
+</body>
+</html>
