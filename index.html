@@ -149,7 +149,6 @@ tr:hover td{background:#fafaf8}
         <th style="text-align:center">Delay last wk</th>
         <th style="text-align:center">4-wk avg</th>
         <th style="text-align:center">Callback %</th>
-        <th style="text-align:center">Guest sentiment</th>
       </tr></thead>
       <tbody id="scorecard-body"></tbody>
     </table>
@@ -168,7 +167,6 @@ tr:hover td{background:#fafaf8}
   <div class="tab" data-tab="units">Units NPS</div>
   <div class="tab" data-tab="delays">Delay heatmap</div>
   <div class="tab" data-tab="delay-monthly">Monthly trend</div>
-  <div class="tab" data-tab="guest-themes">Guest themes</div>
 </div>
 <div id="tab-portfolio" class="content active">
   <div class="filters">
@@ -176,7 +174,7 @@ tr:hover td{background:#fafaf8}
     <button class="filter-btn" onclick="fpf('Numa',this)">Numa</button>
     <button class="filter-btn" onclick="fpf('LSA',this)">LSA</button>
   </div>
-  <table><thead><tr><th style="width:28px"></th><th>Property</th><th style="text-align:center">B.com 30d</th><th style="text-align:center">B.com Clean 30d</th><th style="text-align:center">Cleanings (90d)</th><th style="text-align:center">Coverage %</th><th style="text-align:center">Callback %</th><th style="text-align:center">Guest sentiment</th></tr></thead><tbody id="pf-body"></tbody></table>
+  <table><thead><tr><th style="width:28px"></th><th>Property</th><th style="text-align:center">B.com 30d</th><th style="text-align:center">B.com Clean 30d</th><th style="text-align:center">Cleanings (90d)</th><th style="text-align:center">Callback %</th></tr></thead><tbody id="pf-body"></tbody></table>
 </div>
 <div id="tab-cleaners" class="content">
   <div class="note">✅ <strong>Anjos &amp; Rato:</strong> OTA cleanliness (B.com/Airbnb via <code>cleaner_assignment</code>) + checkout NPS. ⚠️ <strong>LSA:</strong> No individual assignment data in SHINE.</div>
@@ -258,27 +256,6 @@ tr:hover td{background:#fafaf8}
   <div class="slbl" style="margin-bottom:8px">% rooms where cleaner finished after 15:00 · Jan–Jun 2026</div>
   <table id="mth-tbl"><thead id="mth-head"></thead><tbody id="mth-body"></tbody></table>
 </div>
-<div id="tab-guest-themes" class="content">
-  <div class="note" style="background:#eff6ff;border-color:#93c5fd;color:#1e40af;margin-bottom:12px">
-    Glass / Chattermill review themes · cleaning-relevant categories only · 90-day window · as of 2026-06-10<br>
-    <span style="font-size:10px;color:#555">Categories: Housekeeping Issues, Room Overall, Maintenance Issues, Bathroom, Bedroom &amp; Main Room, Temp/AC</span>
-  </div>
-  <div class="filters">
-    <button class="filter-btn active" onclick="fgt('all',this)">All</button>
-    <button class="filter-btn" onclick="fgt('Numa',this)">Numa</button>
-    <button class="filter-btn" onclick="fgt('LSA',this)">LSA</button>
-  </div>
-  <table id="gt-tbl">
-    <thead><tr>
-      <th style="width:28px"></th>
-      <th>Property / Theme</th>
-      <th style="text-align:center;width:90px">Neg mentions</th>
-      <th style="width:120px">Volume</th>
-      <th style="text-align:center;width:80px">Net Sentiment</th>
-    </tr></thead>
-    <tbody id="gt-body"></tbody>
-  </table>
-</div>
 </div>
 
 <script>
@@ -301,7 +278,7 @@ const Q_FAILS=[{"question":"Is the room ready? (HSK callback required)","anjos":
 const UNIT_NPS={"Lisbon Anjos":{"prop_nps":67,"units":[{"unit":"","nps":67,"n":957}]},"Lisbon Rato":{"prop_nps":67,"units":[{"unit":"","nps":67,"n":1081}]},"LSA Liberdade by Numa":{"prop_nps":52,"units":[{"unit":"","nps":52,"n":406}]},"LSA Bairro Alto by Numa":{"prop_nps":52,"units":[{"unit":"","nps":52,"n":106}]},"LSA Mouraria by Numa":{"prop_nps":49,"units":[{"unit":"","nps":49,"n":122}]},"LSA Chiado Emenda by Numa":{"prop_nps":46,"units":[{"unit":"","nps":46,"n":316}]},"LSA Avenida by Numa":{"prop_nps":44,"units":[{"unit":"","nps":44,"n":162}]},"LSA Restauradores by Numa":{"prop_nps":43,"units":[{"unit":"","nps":43,"n":254}]},"LSA Santos by Numa":{"prop_nps":42,"units":[{"unit":"","nps":42,"n":313}]},"LSA Principe Real by Numa":{"prop_nps":41,"units":[{"unit":"","nps":41,"n":165}]},"LSA Baixa Castelo by Numa":{"prop_nps":40,"units":[{"unit":"","nps":40,"n":209}]},"LSA Madalena by Numa":{"prop_nps":38,"units":[{"unit":"","nps":38,"n":185}]},"LSA Baixa Chiado by Numa":{"prop_nps":38,"units":[{"unit":"","nps":38,"n":72}]},"LSA Alvalade by Numa":{"prop_nps":36,"units":[{"unit":"","nps":36,"n":931}]},"LSA Palácio Camões by Numa":{"prop_nps":34,"units":[{"unit":"","nps":34,"n":47}]},"LSA Campos by Numa":{"prop_nps":32,"units":[{"unit":"","nps":32,"n":498}]},"LSA Ascensor da Bica by Numa":{"prop_nps":31,"units":[{"unit":"","nps":31,"n":342}]},"LSA Parque by Numa":{"prop_nps":29,"units":[{"unit":"","nps":29,"n":63}]},"LSA Castelo S. Jorge by Numa":{"prop_nps":25,"units":[{"unit":"","nps":25,"n":4}]},"LSA Estrela by Numa":{"prop_nps":16,"units":[{"unit":"","nps":16,"n":38}]},"LSA Benformoso by Numa":{"prop_nps":10,"units":[{"unit":"","nps":10,"n":10}]}};
 const PROP_AVGS={"LSA Alvalade by Numa":{"avg_clean_ota":8.39,"avg_overall_ota":8.06,"avg_nps":36,"avg_rating":8.06},"LSA Ascensor da Bica by Numa":{"avg_clean_ota":8.58,"avg_overall_ota":8.31,"avg_nps":31,"avg_rating":8.31},"LSA Avenida by Numa":{"avg_clean_ota":8.92,"avg_overall_ota":8.45,"avg_nps":44,"avg_rating":8.45},"LSA Bairro Alto by Numa":{"avg_clean_ota":8.91,"avg_overall_ota":8.55,"avg_nps":52,"avg_rating":8.55},"LSA Baixa Castelo by Numa":{"avg_clean_ota":7.78,"avg_overall_ota":7.97,"avg_nps":40,"avg_rating":7.97},"LSA Baixa Chiado by Numa":{"avg_clean_ota":8.89,"avg_overall_ota":8.17,"avg_nps":38,"avg_rating":8.17},"LSA Benformoso by Numa":{"avg_clean_ota":null,"avg_overall_ota":6.5,"avg_nps":10,"avg_rating":6.5},"LSA Campos by Numa":{"avg_clean_ota":8.22,"avg_overall_ota":7.9,"avg_nps":32,"avg_rating":7.9},"LSA Castelo S. Jorge by Numa":{"avg_clean_ota":null,"avg_overall_ota":7.5,"avg_nps":25,"avg_rating":7.5},"LSA Chiado Emenda by Numa":{"avg_clean_ota":8.76,"avg_overall_ota":8.37,"avg_nps":46,"avg_rating":8.37},"LSA Estrela by Numa":{"avg_clean_ota":4.82,"avg_overall_ota":6.25,"avg_nps":16,"avg_rating":6.25},"LSA Liberdade by Numa":{"avg_clean_ota":8.88,"avg_overall_ota":8.81,"avg_nps":52,"avg_rating":8.81},"LSA Madalena by Numa":{"avg_clean_ota":7.43,"avg_overall_ota":7.45,"avg_nps":38,"avg_rating":7.45},"LSA Mouraria by Numa":{"avg_clean_ota":8.97,"avg_overall_ota":7.91,"avg_nps":49,"avg_rating":7.91},"LSA Palácio Camões by Numa":{"avg_clean_ota":6.11,"avg_overall_ota":7.95,"avg_nps":34,"avg_rating":7.95},"LSA Parque by Numa":{"avg_clean_ota":7.71,"avg_overall_ota":8.37,"avg_nps":29,"avg_rating":8.37},"LSA Principe Real by Numa":{"avg_clean_ota":8.48,"avg_overall_ota":7.82,"avg_nps":41,"avg_rating":7.82},"LSA Restauradores by Numa":{"avg_clean_ota":8.66,"avg_overall_ota":8.2,"avg_nps":43,"avg_rating":8.2},"LSA Santos by Numa":{"avg_clean_ota":8.89,"avg_overall_ota":8.45,"avg_nps":42,"avg_rating":8.45},"Lisbon Anjos":{"avg_clean_ota":9.31,"avg_overall_ota":9.06,"avg_nps":67,"avg_rating":9.06},"Lisbon Rato":{"avg_clean_ota":9.34,"avg_overall_ota":9.11,"avg_nps":67,"avg_rating":9.11}};
 const CURRENT_MONTH="2026-07";
-const GLASS_THEMES={};
+const GLASS_THEMES={}; // reserved for future Glass/Chattermill integration
 
 // ── Derived data (post-process from raw constants) ───────────────────
 const INSP_CB_MAP=(function(){
@@ -358,10 +335,10 @@ function gr(props,fn,showAgg){
   const n=props.filter(p=>DLY_BRAND[p]==='Numa'),l=props.filter(p=>DLY_BRAND[p]==='LSA');
   if(n.length&&l.length){
     return(n.length?'<tr class="gh"><td colspan="20">Numa · Anjos & Rato</td></tr>'+n.map(fn).join(''):'')
-          +(l.length?'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 18 properties</td></tr>'+l.map(fn).join(''):'');
+          +(l.length?'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 19 properties</td></tr>'+l.map(fn).join(''):'');
   }
   if(showAgg&&n.length){return'<tr class="gh"><td colspan="20">Numa · Anjos & Rato</td></tr>'+n.map(fn).join('');}
-  if(showAgg&&l.length){return'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 18 properties</td></tr>'+l.map(fn).join('');}
+  if(showAgg&&l.length){return'<tr class="gh-lsa"><td colspan="20">LSA by Numa · 19 properties</td></tr>'+l.map(fn).join('');}
   return props.map(fn).join('');
 }
 function weekOverall(p){const w=WEEK_DATA[p]||{};let t=0,d=0;WEEKDAYS.forEach(wd=>{const c=w[wd];if(c){t+=c.t;d+=c.d;}});return t?Math.round(d/t*100):null;}
@@ -423,7 +400,7 @@ function brandMetrics(props){
     kpi('Inspection cov.','~6%','amber','of cleanings'),
   ].join('');
   document.getElementById('bp-lsa').innerHTML=[
-    kpi('B.com overall',ls.avgOTA,ls.avgOTA>=8.5?'green':ls.avgOTA>=8?'amber':'red','18 properties avg'),
+    kpi('B.com overall',ls.avgOTA,ls.avgOTA>=8.5?'green':ls.avgOTA>=8?'amber':'red','19 properties avg'),
     kpi('Below 8.0',ls.belowEight,ls.belowEight>5?'red':ls.belowEight>0?'amber':'green','properties'),
     kpi('Avg delay',ls.avgDelay!==null?ls.avgDelay+'%':null,ls.avgDelay>=30?'red':ls.avgDelay>=10?'amber':'green','last week'),
     kpi('Delay ≥ 30%',ls.highDelay,ls.highDelay>8?'red':ls.highDelay>3?'amber':'green','properties'),
@@ -437,7 +414,7 @@ function brandMetrics(props){
     {icon:'📊',text:`<strong>Numa and LSA are two different realities.</strong> Numa averages ${nm.avgOTA} B.com overall vs LSA at ${ls.avgOTA}. Cleanliness scores are consistently lower than overall scores across the LSA portfolio — guests notice cleaning specifically.`},
     cbCleaners.length?{icon:'👤',text:`<strong>${cbCleaners[0].name} at ${cbCleaners[0].property.replace('Lisbon ','')} needs attention.</strong> ${cbCleaners[0].callback_rate}% callback rate across ${cbCleaners[0].inspections} inspections — highest in the team.`}:null,
     {icon:'📋',text:`<strong>Checklist callbacks: ${INSP_CALLBACKS.length} total (Apr–Jun 2026).</strong> All from Anjos & Rato. LSA properties have no inspection checklist data yet.`},
-    {icon:'⚠️',text:`<strong>Inspection coverage is too low for firm cleaner-level conclusions.</strong> ~6% at Anjos, ~3% at Rato. No inspection data yet for any of the 18 LSA properties.`},
+    {icon:'⚠️',text:`<strong>Inspection coverage is too low for firm cleaner-level conclusions.</strong> ~6% at Anjos, ~3% at Rato. No inspection data yet for any of the 19 LSA properties.`},
   ].filter(Boolean);
   document.getElementById('findings-list').innerHTML=findings.map(f=>`<div class="finding"><div class="fi">${f.icon}</div><div class="ft">${f.text}</div></div>`).join('');
 
@@ -445,7 +422,7 @@ function brandMetrics(props){
   const actions=[
     highDelay.length>0?{cls:'ac',n:1,text:`<strong>Investigate delay root cause across all of Lisbon.</strong> ${highDelay.length} of ${DLY_PROPS.length} properties above 30% delay. Are LSA cleaning slots too tight? Wrong 15:00 threshold for this market?`}:null,
     cbCleaners.length?{cls:'ac',n:2,text:`<strong>Review ${cbCleaners[0].name} at ${cbCleaners[0].property.replace('Lisbon ','')}.</strong> ${cbCleaners[0].callback_rate}% callback rate vs 0% for peers. Supervised shift + focused re-training.`}:null,
-    {cls:'aw',n:3,text:`<strong>Start inspection checklist for LSA properties.</strong> No callback data exists for 18 LSA properties. Extend the Google Form or set up equivalent.`},
+    {cls:'aw',n:3,text:`<strong>Start inspection checklist for LSA properties.</strong> No callback data exists for 19 LSA properties. Extend the Google Form or set up equivalent.`},
     {cls:'aw',n:4,text:`<strong>Increase inspection frequency to 10%+.</strong> Currently ~6% at Anjos, ~3% at Rato. Double the coordinator rounds before drawing cleaner-level conclusions.`},
   ].filter(Boolean);
   document.getElementById('actions-list').innerHTML=actions.map(a=>`<div class="action ${a.cls}"><div class="an">${a.n}</div><div class="abody">${a.text}</div></div>`).join('');
@@ -460,21 +437,6 @@ function filterSc(brand,btn){
   document.querySelectorAll('#sc-all,#sc-numa,#sc-lsa').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   buildScorecard(brand);
-}
-// ── GLASS HELPERS ─────────────────────────────────────────────────────
-function glassTopTheme(p){
-  const themes=GLASS_THEMES[p];
-  if(!themes||!themes.length)return null;
-  return themes[0];
-}
-function glassSentCell(p){
-  const t=glassTopTheme(p);
-  if(!t)return`<td style="text-align:center;color:#bbb;font-size:11px">—</td>`;
-  const ns=t.net_sentiment;
-  const nsCol=ns>=0?'#166534':'#991b1b';
-  const nsBg=ns>=0?'#f0fdf4':'#fee2e2';
-  const abbr=t.category.replace('Housekeeping Issues / Requests','HSK Issues').replace('Bedroom & Main Room','Bedroom').replace('Temperature / Climate Control','Temp/AC').replace('Maintenance Issues','Maintenance').replace('Room Overall','Room Overall');
-  return`<td style="text-align:center"><span style="font-size:10px;color:#555">${abbr}</span><br><span style="display:inline-block;margin-top:2px;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:700;background:${nsBg};color:${nsCol}">NS ${ns>0?'+':''}${ns}</span></td>`;
 }
 
 function buildScorecard(brand){
@@ -493,7 +455,6 @@ function buildScorecard(brand){
       <td style="text-align:center">${dw!==null?`<span class="pct ${dc(dw)}">${dw}%</span>`:'—'}</td>
       <td style="text-align:center">${r4!==null?`<span class="pct ${dc(r4)}">${r4}%</span>`:'—'}</td>
       <td style="text-align:center">${cbR!==null?`<span class="pct ${cbR>=40?'c-red':cbR>=20?'c-amber':'c-green'}">${cbR}%</span>`:'—'}</td>
-      ${glassSentCell(p)}
     </tr>`;
   },true);
 }
@@ -503,8 +464,8 @@ let pfB='all';function fpf(b,btn){pfB=b;sf(btn);bldPf();}
 function bldPf(){
   const props=fp(pfB).filter(p=>p in PORTFOLIO);
   document.getElementById('pf-body').innerHTML=gr(props,p=>{
-    const d=PORTFOLIO[p]||{},cov=d.coverage,cb=d.cb_rate;
-    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td><td style="text-align:center"><span class="ota ${oc(d.ota_overall)}">${d.ota_overall??'—'}</span></td><td style="text-align:center"><span class="ota ${oc(d.ota_clean)}">${d.ota_clean??'—'}</span></td><td style="text-align:center">${d.cleanings_90d||0}</td><td style="text-align:center">${cov!=null?`<span class="pct ${cov<5?'c-red':cov<10?'c-amber':'c-green'}">${cov}%</span>`:'—'}</td><td style="text-align:center">${cb!=null?`<span class="pct ${cb>=40?'c-red':cb>=20?'c-amber':'c-green'}">${cb}%<br><span style="font-size:9px;font-weight:400">${d.cb_count}/${d.cb_total}</span></span>`:'—'}</td>${glassSentCell(p)}</tr>`;
+    const d=PORTFOLIO[p]||{},cb=d.cb_rate;
+    return`<tr><td>${badge(p)}</td><td><strong>${p.replace(' by Numa','')}</strong></td><td style="text-align:center"><span class="ota ${oc(d.ota_overall)}">${d.ota_overall??'—'}</span></td><td style="text-align:center"><span class="ota ${oc(d.ota_clean)}">${d.ota_clean??'—'}</span></td><td style="text-align:center">${d.cleanings_90d||0}</td><td style="text-align:center">${cb!=null?`<span class="pct ${cb>=40?'c-red':cb>=20?'c-amber':'c-green'}">${cb}%<br><span style="font-size:9px;font-weight:400">${d.cb_count}/${d.cb_total}</span></span>`:'—'}</td></tr>`;
   });
 }bldPf();
 
@@ -575,34 +536,6 @@ function bldMth(){
   });
 }bldMth();
 
-// ── GUEST THEMES TAB ──────────────────────────────────────────────────
-let gtB='all';function fgt(b,btn){gtB=b;sf(btn);bldGt();}
-function bldGt(){
-  const props=fp(gtB);
-  const allMax=Math.max(...props.flatMap(p=>(GLASS_THEMES[p]||[]).map(t=>t.negative_count)),1);
-  let html='';
-  props.forEach(p=>{
-    const themes=GLASS_THEMES[p];
-    if(!themes||!themes.length)return;
-    const isLSA=DLY_BRAND[p]==='LSA';
-    html+=`<tr class="${isLSA?'gh-lsa':'gh'}"><td colspan="5">${badge(p)} ${p.replace(' by Numa','')}</td></tr>`;
-    themes.forEach(t=>{
-      const barW=Math.round((t.negative_count/allMax)*100);
-      const ns=t.net_sentiment;
-      const nsCol=ns>=0?'#166534':'#991b1b';
-      const nsBg=ns>=0?'#f0fdf4':'#fee2e2';
-      const barCol=ns>=0?'#22c55e':'#ef4444';
-      html+=`<tr>
-        <td></td>
-        <td style="font-size:12px;padding-left:20px">${t.category}</td>
-        <td style="text-align:center;font-size:12px;font-weight:600">${t.negative_count}</td>
-        <td style="padding:0 10px"><div style="height:6px;background:#e5e5e5;border-radius:3px;overflow:hidden"><div style="width:${barW}%;height:100%;background:${barCol};border-radius:3px"></div></div></td>
-        <td style="text-align:center"><span style="padding:2px 7px;border-radius:3px;font-size:11px;font-weight:700;background:${nsBg};color:${nsCol}">NS ${ns>0?'+':''}${ns}</span></td>
-      </tr>`;
-    });
-  });
-  document.getElementById('gt-body').innerHTML=html||'<tr><td colspan="5" style="text-align:center;padding:20px;color:#aaa">No guest theme data available this refresh</td></tr>';
-}bldGt();
 
 document.querySelectorAll('#mode-operational .tab').forEach(t=>t.addEventListener('click',()=>{
   document.querySelectorAll('#mode-operational .tab,#mode-operational .content').forEach(e=>e.classList.remove('active'));
